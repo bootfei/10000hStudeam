@@ -1,0 +1,833 @@
+<title>学习时长库</title>
+<style>
+  /* 布局：Steam 客户端式 —— 顶栏 + 目标条 + 左侧游戏库 + 右侧游戏详情。单一深色世界，刻意不做浅色主题。 */
+  :root {
+    color-scheme: dark;
+    --top: #171a21; --bg: #1b2838; --panel: #16202d; --panel2: #213042; --well: #0e141b;
+    --line: #2a475e; --text: #c7d5e0; --dim: #8f98a0; --white: #ffffff; --blue: #66c0f4; --blue2: #417a9b;
+    --green1: #75b022; --green2: #588a1b; --gold: #e5b143; --gold2: #b8862b; --red: #e06c5a; --red1: #a83232; --red2: #7a1f1f;
+    --purple: #b69cf0;
+    --font: "Motiva Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+    --mono: "SF Mono", Menlo, Consolas, "PingFang SC", monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { background: var(--bg); }
+  body { margin: 0; color: var(--text); font: 14px/1.5 var(--font); }
+  button { font: inherit; cursor: pointer; border: 0; border-radius: 2px; color: inherit; }
+  button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px solid var(--blue); outline-offset: 1px; }
+  button:disabled { opacity: .45; cursor: not-allowed; }
+  input, textarea { font: inherit; background: var(--well); color: var(--text);
+    border: 1px solid var(--line); border-radius: 2px; padding: 6px 8px; width: 100%; }
+
+  header { background: var(--top); display: flex; align-items: center; gap: 28px; padding: 0 24px; height: 64px; }
+  .logo { font-weight: 800; letter-spacing: 2px; font-size: 20px; color: var(--white); }
+  .logo span { color: var(--blue); }
+  nav span { color: var(--blue); font-weight: 700; letter-spacing: 1px; margin-right: 18px; font-size: 15px; }
+  .profile { margin-left: auto; text-align: right; font-size: 12px; color: var(--dim); }
+  .profile b { color: var(--white); font-size: 14px; }
+  .lvl { display: inline-block; border: 2px solid var(--gold); border-radius: 50%; width: 30px; height: 30px;
+    line-height: 26px; text-align: center; color: var(--white); font-weight: 700; margin-left: 10px; vertical-align: middle; }
+
+  .goal { background: linear-gradient(90deg, #1f3a52, var(--bg)); padding: 14px 24px; display: flex; gap: 32px; align-items: center; flex-wrap: wrap; }
+  .goal .bar { flex: 1; min-width: 240px; }
+  .track { height: 10px; background: var(--well); border-radius: 5px; overflow: hidden; }
+  .fill { height: 100%; background: linear-gradient(90deg, var(--blue), var(--blue2)); }
+  .stat { font-size: 12px; color: var(--dim); }
+  .stat b { display: block; font-size: 22px; color: var(--white); font-variant-numeric: tabular-nums; }
+
+  main { display: grid; grid-template-columns: 280px minmax(0, 1fr); min-height: calc(100vh - 150px); }
+  aside { background: var(--panel); border-right: 1px solid var(--well); }
+  aside h3 { margin: 0; padding: 12px 16px; font-size: 12px; color: var(--dim); letter-spacing: 1px; display: flex; justify-content: space-between; align-items: center; }
+  aside h3 button { background: none; color: var(--blue); font-size: 20px; line-height: 1; padding: 0 4px; }
+  .game { display: flex; align-items: center; gap: 10px; padding: 6px 16px; cursor: pointer; width: 100%; background: none; text-align: left; border-radius: 0; }
+  .game:hover { background: var(--panel2); }
+  .game.active { background: #3d4450; color: var(--white); }
+  .game .ico { width: 24px; height: 24px; border-radius: 2px; display: grid; place-items: center; font-size: 14px; flex: none; }
+  .game .name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .game .h { margin-left: auto; font-size: 12px; color: var(--dim); white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .game.running .name::after { content: " · 运行中"; color: var(--green1); font-size: 12px; }
+
+  .hero { height: 180px; position: relative; display: flex; align-items: flex-end; padding: 24px 32px; overflow: hidden; }
+  .hero h1 { margin: 0; font-size: 38px; color: var(--white); text-shadow: 0 2px 8px rgba(0,0,0,.6); position: relative; text-wrap: balance; }
+  .hero .emoji { position: absolute; right: 40px; top: 16px; font-size: 120px; opacity: .25; }
+  .playbar { background: rgba(0,0,0,.35); display: flex; align-items: center; gap: 28px; padding: 16px 32px; flex-wrap: wrap; }
+  .play { background: linear-gradient(90deg, var(--green1), var(--green2)); color: var(--white); font-size: 20px;
+    font-weight: 700; padding: 10px 36px; letter-spacing: 1px; }
+  .play.stop { background: linear-gradient(90deg, #4c7fa6, #2d5674); }
+  .play:hover:not(:disabled), .boss:hover, .ok:hover, .no:hover, .ai:hover:not(:disabled) { filter: brightness(1.15); }
+  .ghost { background: #3d4c5d; color: var(--text); padding: 6px 12px; font-size: 13px; }
+  .ghost:hover { background: #4b5d72; color: var(--white); }
+  .link { background: none; color: var(--dim); text-decoration: underline; padding: 0; font-size: 12px; }
+  .link:hover { color: var(--white); }
+  .ai { background: linear-gradient(90deg, #6b4fbb, #4a3590); color: var(--white); padding: 6px 12px; font-size: 13px; }
+  .content { padding: 24px 32px; display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 24px; align-items: start; }
+  .col { display: grid; gap: 24px; min-width: 0; }
+  .card { background: rgba(0,0,0,.2); padding: 16px; min-width: 0; }
+  .card h2 { margin: 0 0 12px; font-size: 13px; letter-spacing: 1px; color: var(--white); display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .dlc { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 12px; padding: 10px 12px; background: var(--panel2); margin-bottom: 4px; }
+  .dlc .t { color: var(--white); }
+  .dlc .m { color: var(--dim); font-size: 12px; white-space: pre-wrap; }
+  .dlc .d { grid-row: span 2; align-self: center; color: var(--blue); font-weight: 700; text-align: right; font-variant-numeric: tabular-nums; }
+  .empty { color: var(--dim); text-align: center; padding: 36px 20px; }
+  .timer { font-variant-numeric: tabular-nums; font-size: 22px; color: var(--green1); display: block; }
+
+  .achsum { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; font-size: 13px; }
+  .achsum .track { flex: 1; }
+  .achsum .fill { background: linear-gradient(90deg, var(--gold), var(--gold2)); }
+  .ach { display: flex; gap: 12px; align-items: center; padding: 8px 10px; background: var(--panel2); margin-bottom: 4px; flex-wrap: wrap; }
+  .ach .badge { width: 44px; height: 44px; display: grid; place-items: center; background: var(--well); border: 1px solid var(--line); font-size: 22px; flex: none; filter: grayscale(1); opacity: .5; }
+  .ach.got .badge { filter: none; opacity: 1; border-color: var(--gold); box-shadow: 0 0 8px rgba(229,177,67,.35); }
+  .ach .info { flex: 1; min-width: 160px; }
+  .ach .title { color: var(--white); }
+  .ach:not(.got) .title { color: var(--dim); }
+  .ach .sub { font-size: 12px; color: var(--dim); }
+  .ach .acts { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+  .boss { background: linear-gradient(90deg, var(--red1), var(--red2)); color: var(--white); padding: 6px 12px; font-size: 13px; font-weight: 700; }
+  .qlist { margin: 0 0 10px 56px; font-size: 12px; }
+  .qrow { display: flex; gap: 8px; padding: 5px 0; border-bottom: 1px solid #22303f; align-items: baseline; }
+  .qrow .qt { flex: 1; min-width: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .qrow .qs { flex: none; color: var(--dim); font-variant-numeric: tabular-nums; }
+  .qbar { display: flex; gap: 14px; flex-wrap: wrap; padding-top: 8px; align-items: center; }
+  .by { display: inline-block; font-size: 11px; padding: 0 5px; border-radius: 2px; flex: none; }
+  .by.me { background: rgba(102,192,244,.15); color: var(--blue); }
+  .by.claude { background: rgba(182,156,240,.15); color: var(--purple); }
+  .mini { display: flex; gap: 10px; align-items: center; padding: 5px 0; opacity: .35; font-size: 13px; }
+  .mini.got { opacity: 1; }
+  .mini .badge { width: 30px; height: 30px; display: grid; place-items: center; background: var(--well); border: 1px solid var(--line); }
+  .mini .t { color: var(--white); }
+  .split { display: flex; justify-content: space-between; font-size: 12px; color: var(--dim); padding: 4px 0; }
+  .split b { color: var(--white); font-variant-numeric: tabular-nums; }
+
+  dialog { background: var(--panel2); color: var(--text); border: 1px solid var(--line); padding: 24px; width: min(480px, 92vw); max-height: 90vh; overflow: auto; }
+  dialog::backdrop { background: rgba(0,0,0,.75); }
+  dialog h2 { margin-top: 0; color: var(--white); font-size: 18px; }
+  dialog label { display: block; margin: 10px 0 4px; font-size: 12px; color: var(--dim); }
+  dialog .row { display: flex; gap: 8px; justify-content: flex-end; margin-top: 18px; align-items: center; flex-wrap: wrap; }
+  .ok { background: linear-gradient(90deg, var(--green1), var(--green2)); color: var(--white); padding: 8px 18px; }
+  .no { background: linear-gradient(90deg, var(--red1), var(--red2)); color: var(--white); padding: 8px 18px; }
+  #quizDlg, #genDlg { width: min(640px, 94vw); }
+  .qhead { display: flex; justify-content: space-between; gap: 12px; font-size: 12px; color: var(--dim); letter-spacing: 1px; }
+  .qdots { display: flex; gap: 4px; margin: 8px 0 16px; }
+  .qdots i { flex: 1; height: 4px; background: var(--well); }
+  .qdots i.r { background: var(--green1); } .qdots i.w { background: var(--red); } .qdots i.c { background: var(--blue); }
+  .qtext { font-size: 16px; color: var(--white); white-space: pre-wrap; overflow-wrap: anywhere; font-family: var(--mono); background: var(--well); padding: 14px; border-left: 3px solid var(--blue); }
+  .qans { margin-top: 12px; padding: 12px 14px; background: rgba(117,176,34,.1); border-left: 3px solid var(--green1); white-space: pre-wrap; overflow-wrap: anywhere; }
+  .qans b, .qai b { display: block; font-size: 12px; margin-bottom: 4px; }
+  .qans b { color: var(--green1); }
+  .qai { margin-top: 12px; padding: 12px 14px; background: rgba(182,156,240,.1); border-left: 3px solid var(--purple); white-space: pre-wrap; }
+  .qai b { color: var(--purple); }
+  .verdict { font-weight: 700; }
+  .verdict.right { color: var(--green1); } .verdict.partial { color: var(--gold); } .verdict.wrong { color: var(--red); }
+  .qsrc { font-size: 12px; color: var(--dim); margin-top: 6px; }
+  .result { text-align: center; padding: 10px 0; }
+  .result .big { font-size: 48px; }
+  .result h3 { color: var(--white); margin: 8px 0; font-size: 22px; }
+  .cand { display: flex; gap: 10px; padding: 10px; background: var(--well); margin-bottom: 6px; align-items: flex-start; }
+  .cand input { width: auto; margin-top: 4px; }
+  .cand .q { color: var(--white); white-space: pre-wrap; font-family: var(--mono); font-size: 13px; }
+  .cand .a { color: var(--dim); font-size: 12px; white-space: pre-wrap; margin-top: 4px; }
+  .note { font-size: 12px; color: var(--dim); }
+  .err { color: var(--red); font-size: 13px; }
+
+  #toasts { position: fixed; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); display: grid; gap: 8px; z-index: 10; }
+  .toast { display: flex; gap: 12px; align-items: center; width: min(300px, calc(100vw - 32px)); padding: 12px; color: var(--white);
+    background: linear-gradient(135deg, var(--line), var(--bg)); border: 1px solid #3c6a8a; box-shadow: 0 6px 20px rgba(0,0,0,.5);
+    animation: slide .35s ease-out, fade .5s ease-in 5s forwards; }
+  .toast .badge { width: 48px; height: 48px; display: grid; place-items: center; font-size: 26px; background: var(--well); border: 1px solid var(--gold); flex: none; }
+  .toast small { display: block; color: var(--dim); font-size: 11px; }
+  @keyframes slide { from { transform: translateY(120%); opacity: 0; } }
+  @keyframes fade { to { opacity: 0; transform: translateY(20px); } }
+  @media (prefers-reduced-motion: reduce) { .toast { animation: none; } }
+
+  footer { padding: 12px 24px; display: flex; gap: 8px; background: var(--top); font-size: 12px; color: var(--dim); align-items: center; flex-wrap: wrap; }
+  #banner { background: #3a2a14; color: var(--gold); padding: 10px 24px; font-size: 13px; }
+
+  @media (max-width: 860px) {
+    header { padding: 0 16px; gap: 16px; }
+    .goal { padding: 14px 16px; }
+    main { grid-template-columns: minmax(0, 1fr); }
+    aside { border-right: 0; }
+    .content { grid-template-columns: minmax(0, 1fr); padding: 16px; }
+    .hero { padding: 16px; height: 140px; }
+    .hero h1 { font-size: 26px; }
+    .playbar { padding: 16px; gap: 16px; }
+    header nav { display: none; }
+    .qlist { margin-left: 0; }
+    footer { padding: 12px 16px; }
+  }
+</style>
+
+<header>
+  <div class="logo">STUDY<span>STEAM</span></div>
+  <nav><span>库</span><span>成就</span></nav>
+  <div class="profile" id="profile"></div>
+</header>
+<div id="banner" hidden></div>
+<section class="goal" id="goal"></section>
+<main>
+  <aside>
+    <h3>游戏库（科目）<button id="addGame" title="添加游戏" aria-label="添加游戏">＋</button></h3>
+    <div id="list"></div>
+  </aside>
+  <section id="detail"></section>
+</main>
+<footer>
+  <button class="ghost" id="exportBtn">导出存档 JSON</button>
+  <button class="ghost" id="importBtn">导入存档</button>
+  <button class="ghost" id="goalBtn">设置目标 / 起始日期</button>
+  <input type="file" id="importFile" accept="application/json" hidden>
+  <span style="margin-left:auto" id="syncNote">存档保存在云端</span>
+</footer>
+<div id="toasts"></div>
+
+<dialog id="askDlg"><form id="askForm"></form></dialog>
+<dialog id="quizDlg"><div id="quizBody"></div></dialog>
+<dialog id="genDlg"><div id="genBody"></div></dialog>
+
+<script>
+const uid = () => Math.random().toString(36).slice(2, 10);
+const today = () => { const d = new Date(); return new Date(d - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 10); };
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const clone = o => JSON.parse(JSON.stringify(o));
+
+const HOUR_ACHIEVEMENTS = [
+  [1, '🐣', '新手村', '累计 1 小时'],
+  [10, '🔥', '上手了', '累计 10 小时'],
+  [50, '⚔️', '小有所成', '累计 50 小时'],
+  [100, '🏅', '百小时俱乐部', '累计 100 小时'],
+  [500, '💎', '硬核玩家', '累计 500 小时'],
+  [1000, '👑', '千锤百炼', '累计 1000 小时'],
+];
+const WARMUP_SIZE = 3;
+const DEFAULT_SETTINGS = { start: '2026-11-01', running: null, goals: [
+  { name: '2 年 · 硕士期间', hours: 2500, years: 2 },
+  { name: '5 年 · 终极目标', hours: 10000, years: 5 },
+]};
+
+// ---------- state（云端为准，本地只是镜像） ----------
+let db = null, sample = null, downloads = null;
+let games = [];                 // [{id, name, emoji, color, created, chapters, dlcs}]
+let settings = clone(DEFAULT_SETTINGS);
+let loaded = { games: false, settings: false };
+let readOnly = false;
+let selected = null;
+try { selected = localStorage.getItem('study-steam-selected'); } catch (e) {}
+const select = id => { selected = id; try { localStorage.setItem('study-steam-selected', id || ''); } catch (e) {} };
+
+// 每个文档一次只写一个：排队，写入时取最新内容
+const queues = {};
+function put(path, getData) {
+  if (!db || readOnly) return;
+  queues[path] = (queues[path] || Promise.resolve()).then(async () => {
+    const data = getData();
+    try {
+      if (data === null) await db.doc(path).delete();
+      else await db.doc(path).set(data);
+    } catch (e) { onWriteError(e); }
+  });
+}
+// 弹窗等待期间云端快照可能替换了 games 里的对象，所以以传入的 g 为准，并放回本地镜像
+const saveGame = g => {
+  if (game(g.id) !== g) games = games.filter(x => x.id !== g.id).concat(g);
+  put('games/' + g.id, () => { const { id: _, ...body } = g; return clone(body); });
+};
+const deleteGame = id => put('games/' + id, () => null);
+const saveSettings = () => put('meta/settings', () => clone(settings));
+
+function onWriteError(e) {
+  if (e?.code === 'invalid_argument') { readOnly = true; showBanner('你没有修改这个存档的权限，页面现在是只读的。'); }
+  else if (e?.code === 'quota_exceeded') showBanner('云端存档已满，先导出备份，再删除一些旧 DLC。');
+  else showBanner('保存失败（' + (e?.code || '未知') + '），刷新页面后再试。');
+}
+function showBanner(msg) { const b = $('#banner'); b.textContent = msg; b.hidden = !msg; }
+
+// ---------- derived ----------
+const mins = g => g.dlcs.reduce((a, d) => a + d.minutes, 0);
+const totalMins = () => games.reduce((a, g) => a + mins(g), 0);
+const fmtH = m => (m / 60).toFixed(1);
+const recentMins = (g, days = 14) => {
+  const d = new Date(Date.now() - days * 864e5);
+  const cut = new Date(d - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 10);
+  return g.dlcs.filter(x => x.date >= cut).reduce((a, x) => a + x.minutes, 0);
+};
+const lastPlayed = g => g.dlcs.reduce((a, d) => d.date > a ? d.date : a, '');
+const level = m => Math.floor(Math.sqrt(m / 60)); // 1h→1, 100h→10, 10000h→100
+const game = id => games.find(g => g.id === id);
+const chapter = (g, id) => g?.chapters.find(c => c.id === id);
+const question = (c, id) => c?.questions.find(q => q.id === id);
+const accuracy = qs => { const r = qs.reduce((a, q) => a + q.right, 0), t = qs.reduce((a, q) => a + q.right + q.wrong, 0); return t ? Math.round(r / t * 100) + '%' : '—'; };
+const byTag = by => by === 'me' ? '<span class="by me">我</span>' : '<span class="by claude">Claude</span>';
+
+// ---------- in-page dialogs（查看器里没有 alert/confirm/prompt） ----------
+function ask({ title, body = '', fields = [], ok = '确定', danger = false, cancel = '取消' }) {
+  return new Promise(resolve => {
+    const f = $('#askForm');
+    f.innerHTML = `<h2>${esc(title)}</h2>${body ? `<p>${esc(body)}</p>` : ''}
+      ${fields.map((x, i) => `<label for="ask_${i}">${esc(x.label)}</label>${x.type === 'textarea'
+        ? `<textarea id="ask_${i}" name="${x.name}" rows="${x.rows || 4}" ${x.required ? 'required' : ''} placeholder="${esc(x.placeholder || '')}">${esc(x.value || '')}</textarea>`
+        : `<input id="ask_${i}" name="${x.name}" type="${x.type || 'text'}" value="${esc(x.value ?? '')}" ${x.required ? 'required' : ''} ${x.min != null ? `min="${x.min}"` : ''} maxlength="${x.max || 200}" placeholder="${esc(x.placeholder || '')}" ${x.type === 'color' ? 'style="height:36px;padding:2px"' : ''}>`}`).join('')}
+      <div class="row"><button type="button" class="ghost" data-cancel>${esc(cancel)}</button><button class="${danger ? 'no' : 'ok'}">${esc(ok)}</button></div>`;
+    const dlg = $('#askDlg');
+    let done = false;
+    const finish = v => { if (done) return; done = true; dlg.close(); resolve(v); };
+    f.onsubmit = e => { e.preventDefault(); finish(Object.fromEntries(new FormData(f))); };
+    f.querySelector('[data-cancel]').onclick = () => finish(null);
+    dlg.oncancel = e => { e.preventDefault(); finish(null); };
+    dlg.showModal();
+    f.querySelector('input,textarea')?.focus();
+  });
+}
+
+// ---------- render ----------
+let expanded = null;
+
+function render() {
+  const total = totalMins();
+  const recent = games.reduce((a, g) => a + recentMins(g), 0);
+  const elapsedWeeks = Math.max(0, (Date.now() - new Date(settings.start)) / 864e5 / 7);
+  const allCh = games.flatMap(g => g.chapters);
+  const allQ = allCh.flatMap(c => c.questions);
+  $('#profile').innerHTML = `<b>学习者</b><span class="lvl">${level(total)}</span><br>${games.length} 款游戏 · ${fmtH(total)} 小时 · 🏆 ${allCh.filter(c => c.done).length}/${allCh.length}`;
+
+  $('#goal').innerHTML = `
+    <div class="stat">总游戏时长<b>${fmtH(total)} h</b></div>
+    <div class="stat">过去两周<b>${fmtH(recent)} h</b></div>
+    <div class="stat">题库<b>${allQ.length}</b></div>
+    ${settings.goals.map(goal => {
+      const pct = Math.min(100, total / 60 / goal.hours * 100);
+      const perWeek = goal.hours / (goal.years * 52);
+      const expected = Math.min(goal.hours, perWeek * elapsedWeeks);
+      const diff = total / 60 - expected;
+      const status = elapsedWeeks === 0
+        ? `${esc(settings.start)} 开始计算`
+        : `按计划应到 ${expected.toFixed(1)}h，${diff >= 0 ? `<span style="color:var(--green1)">领先 ${diff.toFixed(1)}h</span>` : `<span style="color:var(--red)">落后 ${(-diff).toFixed(1)}h</span>`}`;
+      return `<div class="bar">
+        <div class="stat" style="display:flex;justify-content:space-between;gap:8px"><span>${esc(goal.name)} · ${goal.hours.toLocaleString()}h（每周 ${perWeek.toFixed(1)}h）</span><span>${pct.toFixed(2)}%</span></div>
+        <div class="track"><div class="fill" style="width:${pct}%"></div></div>
+        <div class="stat" style="margin-top:4px">${status}</div>
+      </div>`;
+    }).join('')}`;
+
+  const sorted = [...games].sort((a, b) => (lastPlayed(b) || b.created || '').localeCompare(lastPlayed(a) || a.created || '') || a.name.localeCompare(b.name));
+  $('#list').innerHTML = !loaded.games
+    ? `<div class="empty" style="padding:20px">${db === null ? '正在连接云端存档…' : '正在读取存档…'}</div>`
+    : sorted.map(g => `
+      <button class="game ${g.id === selected ? 'active' : ''} ${settings.running?.gameId === g.id ? 'running' : ''}" data-id="${g.id}">
+        <span class="ico" style="background:${esc(g.color)}">${esc(g.emoji)}</span>
+        <span class="name">${esc(g.name)}</span><span class="h">${fmtH(mins(g))}h</span>
+      </button>`).join('') || '<div class="empty" style="padding:20px">库里还没有游戏。点右上角 ＋ 添加第一个科目。</div>';
+
+  renderDetail();
+}
+
+function renderChapters(g) {
+  const done = g.chapters.filter(c => c.done).length;
+  const pct = g.chapters.length ? done / g.chapters.length * 100 : 0;
+  return `
+    <div class="card">
+      <h2>章节成就<button class="ghost" data-act="addCh">＋ 章节</button></h2>
+      ${g.chapters.length ? `<div class="achsum"><span>已解锁 ${done} / ${g.chapters.length}</span><div class="track"><div class="fill" style="width:${pct}%"></div></div><span>${Math.round(pct)}%</span></div>` : ''}
+      ${g.chapters.map(c => {
+        const n = c.questions.length;
+        const sub = c.done
+          ? `解锁于 ${esc(c.doneDate)}${n ? ` · ${n} 题 · 正确率 ${accuracy(c.questions)}` : ''}`
+          : n ? `Boss 战：${n} 题全对即解锁 · 正确率 ${accuracy(c.questions)}` : '题库为空：出几道题，或学完直接标记完成';
+        return `
+          <div class="ach ${c.done ? 'got' : ''}">
+            <div class="badge">${c.done ? '🏆' : '🔒'}</div>
+            <div class="info"><div class="title">${esc(c.name)}</div><div class="sub">${sub}</div></div>
+            <div class="acts">
+              ${!c.done && n ? `<button class="boss" data-act="boss" data-ch="${c.id}">⚔ 挑战</button>` : ''}
+              ${!c.done && !n ? `<button class="ok" style="padding:6px 12px;font-size:13px" data-act="mark" data-ch="${c.id}">✓ 完成</button>` : ''}
+              ${c.done && n ? `<button class="ghost" data-act="boss" data-ch="${c.id}">复习</button>` : ''}
+              <button class="link" data-act="toggleQ" data-ch="${c.id}" aria-expanded="${expanded === c.id}">题库 ${n}</button>
+            </div>
+          </div>
+          ${expanded === c.id ? `<div class="qlist">
+            ${c.questions.map(q => `<div class="qrow">${byTag(q.by)}<span class="qt">${esc(q.q)}</span><span class="qs">✓${q.right} ✗${q.wrong}</span><button class="link" data-act="delQ" data-ch="${c.id}" data-q="${q.id}">删</button></div>`).join('') || '<div class="note" style="padding:6px 0">这一章还没有题。</div>'}
+            <div class="qbar">
+              <button class="ghost" data-act="addQ" data-ch="${c.id}">✍ 我来出题</button>
+              ${sample ? `<button class="ai" data-act="genQ" data-ch="${c.id}">✨ Claude 出题</button>` : ''}
+              ${!c.done && n ? `<button class="link" data-act="mark" data-ch="${c.id}">跳过考核，直接标记完成</button>` : ''}
+              ${c.done ? `<button class="link" data-act="unmark" data-ch="${c.id}">重新锁定</button>` : ''}
+              <button class="link" data-act="renameCh" data-ch="${c.id}">改名</button>
+              <button class="link" data-act="delCh" data-ch="${c.id}">删除章节</button>
+            </div>
+          </div>` : ''}`;
+      }).join('') || '<div class="empty">还没有章节。按课程或教材目录加几个，学完一个解锁一个。</div>'}
+    </div>`;
+}
+
+function renderDetail() {
+  const g = game(selected) || (loaded.games && games[0]);
+  if (g && g.id !== selected) select(g.id);
+  if (!g) { $('#detail').innerHTML = `<div class="empty">${loaded.games ? '从左侧选择一个游戏，或者新建一个。' : ''}</div>`; return; }
+  const m = mins(g);
+  const running = settings.running?.gameId === g.id;
+  const otherRunning = settings.running && !running;
+  const dlcs = [...g.dlcs].sort((a, b) => b.date.localeCompare(a.date));
+  const qs = g.chapters.flatMap(c => c.questions);
+  const mine = qs.filter(q => q.by === 'me').length;
+
+  $('#detail').innerHTML = `
+    <div class="hero" style="background:linear-gradient(180deg, ${esc(g.color)}cc, var(--bg))">
+      <div class="emoji">${esc(g.emoji)}</div><h1>${esc(g.name)}</h1>
+    </div>
+    <div class="playbar">
+      ${running
+        ? `<button class="play stop" data-act="stop">■ 停止</button><div class="stat">本次游玩<span class="timer" id="timer"></span></div>`
+        : `<button class="play" data-act="play" ${otherRunning || readOnly ? 'disabled' : ''} ${otherRunning ? 'title="另一个游戏正在运行"' : ''}>▶ 开始游戏</button>`}
+      <div class="stat">游戏时间<b>${fmtH(m)} 小时</b></div>
+      <div class="stat">过去两周<b>${fmtH(recentMins(g))} 小时</b></div>
+      <div class="stat">最后运行<b>${lastPlayed(g) || '—'}</b></div>
+      <div class="stat">DLC 数<b>${g.dlcs.length}</b></div>
+      <button class="link" data-act="delGame" style="margin-left:auto">从库中移除</button>
+    </div>
+    <div class="content">
+      <div class="col">
+        ${renderChapters(g)}
+        <div class="card">
+          <h2>DLC（练习记录）<button class="ghost" data-act="addDlc">＋ 手动添加</button></h2>
+          ${dlcs.map(d => `
+            <div class="dlc">
+              <span class="t">${esc(d.name)}</span>
+              <span class="d">${fmtH(d.minutes)} h <button class="link" data-act="delDlc" data-dlc="${d.id}">删除</button></span>
+              <span class="m">${esc(d.date)}${d.note ? ' · ' + esc(d.note) : ''}</span>
+            </div>`).join('') || '<div class="empty">还没有 DLC。点“开始游戏”计时，或手动补记一次练习。</div>'}
+        </div>
+      </div>
+      <div class="col">
+        <div class="card">
+          <h2>题库</h2>
+          <div class="split"><span>总题数</span><b>${qs.length}</b></div>
+          <div class="split"><span>${byTag('me')} 我出的</span><b>${mine}</b></div>
+          <div class="split"><span>${byTag('claude')} Claude 出的</span><b>${qs.length - mine}</b></div>
+          <div class="split"><span>累计正确率</span><b>${accuracy(qs)}</b></div>
+        </div>
+        <div class="card">
+          <h2>时长成就</h2>
+          ${HOUR_ACHIEVEMENTS.map(([h, i, t, d]) => `
+            <div class="mini ${m >= h * 60 ? 'got' : ''}"><div class="badge">${i}</div><div><div class="t">${t}</div><div class="stat">${d}</div></div></div>`).join('')}
+        </div>
+      </div>
+    </div>`;
+  tick();
+}
+
+function tick() {
+  const el = $('#timer');
+  if (!el || !settings.running) return;
+  const s = Math.max(0, Math.floor((Date.now() - settings.running.start) / 1000));
+  el.textContent = [Math.floor(s / 3600), Math.floor(s / 60) % 60, s % 60].map(n => String(n).padStart(2, '0')).join(':');
+}
+setInterval(tick, 1000);
+
+function toast(icon, title, sub) {
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.innerHTML = `<div class="badge">${icon}</div><div><small>成就已解锁</small>${esc(title)}<small>${esc(sub)}</small></div>`;
+  $('#toasts').append(el);
+  setTimeout(() => el.remove(), 5600);
+}
+function unlock(g, c) { c.done = true; c.doneDate = today(); toast('🏆', c.name, g.name); }
+
+// ---------- quiz ----------
+// mode: 'warmup'（开始游戏前热身，结束后计时）| 'boss'（章节考核，全对解锁）
+// 只存 id，每次从最新的 games 里取，避免云端快照替换对象后改到旧副本
+let quiz = null;
+
+function warmupPool(g) {
+  const firstTodo = g.chapters.find(c => !c.done);
+  return g.chapters.filter(c => c.done || c === firstTodo).flatMap(c => c.questions.map(q => ({ c, q })));
+}
+function pickWeighted(pool, n) {
+  const items = pool.map(it => ({ it, w: Math.max(0.2, 1 + it.q.wrong * 2 - it.q.right * 0.5) }));
+  const out = [];
+  while (out.length < n && items.length) {
+    let r = Math.random() * items.reduce((a, x) => a + x.w, 0);
+    const i = items.findIndex(x => (r -= x.w) <= 0);
+    out.push(items.splice(i < 0 ? items.length - 1 : i, 1)[0].it);
+  }
+  return out;
+}
+const freshGrade = () => ({ status: 'idle', verdict: null, feedback: '', ctl: null });
+
+function startQuiz(mode, g, c) {
+  const items = (mode === 'boss' ? shuffle(c.questions.map(q => ({ c, q }))) : pickWeighted(warmupPool(g), WARMUP_SIZE))
+    .map(({ c, q }) => ({ cid: c.id, qid: q.id }));
+  if (!items.length) { if (mode === 'warmup') startTimer(g, null); return; }
+  quiz = { mode, gameId: g.id, chapterId: c?.id, wasDone: !!c?.done, items, i: 0, results: [], revealed: false, draft: '', grade: freshGrade() };
+  renderQuiz();
+  $('#quizDlg').showModal();
+}
+
+function renderQuiz() {
+  const g = game(quiz.gameId);
+  if (!g) { closeQuiz(); return; }
+  const dots = quiz.items.map((_, i) => `<i class="${quiz.results[i] === true ? 'r' : quiz.results[i] === false ? 'w' : i === quiz.i ? 'c' : ''}"></i>`).join('');
+  const label = quiz.mode === 'boss' ? `⚔ BOSS 战 · ${esc(chapter(g, quiz.chapterId)?.name)}` : `🔥 开局热身 · ${esc(g.name)}`;
+
+  if (quiz.i >= quiz.items.length) {
+    const right = quiz.results.filter(Boolean).length, n = quiz.items.length;
+    let html;
+    if (quiz.mode === 'boss') {
+      const win = right === n;
+      html = `<div class="result"><div class="big">${win ? '🏆' : '💀'}</div>
+        <h3>${win ? (quiz.wasDone ? '复习全对' : 'Boss 已击败！') : `还差 ${n - right} 题`}</h3>
+        <p>${right} / ${n} 题答对${win ? '' : '。把答错的题弄懂，下次再战。'}</p></div>
+        <div class="row"><button class="ok" data-q="close">${win && !quiz.wasDone ? '收下成就' : '知道了'}</button></div>`;
+    } else {
+      html = `<div class="result"><div class="big">🎮</div><h3>热身完成</h3><p>${right} / ${n} 题答对，开始计时吧。</p></div>
+        <div class="row"><button class="link" data-q="close">先不玩了</button><button class="play" data-q="go">▶ 开始计时</button></div>`;
+    }
+    $('#quizBody').innerHTML = `<div class="qhead"><span>${label}</span></div><div class="qdots">${dots}</div>${html}`;
+    return;
+  }
+
+  const it = quiz.items[quiz.i];
+  const c = chapter(g, it.cid), q = question(c, it.qid);
+  if (!q) { quiz.items.splice(quiz.i, 1); renderQuiz(); return; } // 题被删了，跳过
+  const gr = quiz.grade;
+  const verdictText = { right: '答对了', partial: '部分正确', wrong: '没答对' };
+  $('#quizBody').innerHTML = `
+    <div class="qhead"><span>${label}</span><span>${quiz.i + 1} / ${quiz.items.length}</span></div>
+    <div class="qdots">${dots}</div>
+    <div class="qtext">${esc(q.q)}</div>
+    <div class="qsrc">${byTag(q.by)} 出自：${esc(c.name)} · 历史 ✓${q.right} ✗${q.wrong}</div>
+    <label for="draft" style="margin-top:14px">先自己答，写下来再看答案</label>
+    <textarea id="draft" rows="3" ${quiz.revealed || gr.status === 'loading' ? 'readonly' : ''}>${esc(quiz.draft)}</textarea>
+    ${gr.status === 'loading' ? `<div class="qai"><b>Claude 批改</b>Claude 思考中… <button class="link" data-q="stopGrade">停止</button></div>` : ''}
+    ${gr.status === 'done' ? `<div class="qai"><b>Claude 批改 · <span class="verdict ${gr.verdict}">${verdictText[gr.verdict] || ''}</span></b>${esc(gr.feedback)}</div>` : ''}
+    ${gr.status === 'error' ? `<div class="qai"><b>Claude 批改</b><span class="err">${esc(gr.feedback)}</span></div>` : ''}
+    ${quiz.revealed ? `<div class="qans"><b>参考答案</b>${esc(q.a)}</div>` : ''}
+    <div class="row">
+      <button class="link" data-q="close" style="margin-right:auto">退出</button>
+      ${quiz.revealed
+        ? `<button class="no" data-q="wrong">✗ 没答对</button><button class="ok" data-q="right">✓ 答对了</button>`
+        : `${sample ? `<button class="ai" data-q="grade" ${gr.status === 'loading' ? 'disabled' : ''}>✨ 让 Claude 批改</button>` : ''}<button class="ghost" data-q="reveal" style="padding:8px 18px">揭晓答案</button>`}
+    </div>`;
+  if (!quiz.revealed && gr.status !== 'loading') setTimeout(() => $('#draft')?.focus(), 0);
+}
+
+const SAMPLE_ERR = {
+  not_granted: '你没有允许这个页面使用 Claude。', sampling_disabled: '这个账号不能使用 Claude。',
+  rate_limited: '调用太频繁或额度用完了，稍后再试。', session_expired: '登录已过期，请重新登录 claude.ai。',
+  refused: 'Claude 拒绝回答这个输入。', invalid_json: 'Claude 的回复格式不对，再试一次。',
+};
+const sampleErr = e => SAMPLE_ERR[e?.code] || 'Claude 暂时没有回应，再试一次。';
+const hideSampleIfDenied = e => { if (['not_granted', 'sampling_disabled', 'not_declared', 'capability_disabled', 'capability_removed'].includes(e?.code)) { sample = null; render(); } };
+
+async function gradeCurrent() {
+  const g = game(quiz.gameId), it = quiz.items[quiz.i];
+  const c = chapter(g, it.cid), q = question(c, it.qid);
+  quiz.draft = $('#draft').value;
+  if (!quiz.draft.trim()) { quiz.grade = { ...freshGrade(), status: 'error', feedback: '先写下你的答案，再让 Claude 批改。' }; renderQuiz(); return; }
+  const ctl = new AbortController();
+  const token = quiz;
+  quiz.grade = { status: 'loading', verdict: null, feedback: '', ctl };
+  renderQuiz();
+  try {
+    const r = await sample.json(
+`你在批改一道简答题。判断学习者的回答是否抓住了参考答案的要点：措辞不同没关系，但关键的数值、形状、原因必须对。
+
+科目：${g.name}
+章节：${c.name}
+题目：
+${q.q}
+
+参考答案：
+${q.a}
+
+学习者的回答：
+${quiz.draft}
+
+只回复一个 JSON 对象：{"verdict": "right" | "partial" | "wrong", "feedback": "一到三句中文点评：对在哪里、错在哪里、漏了什么"}`,
+      { signal: ctl.signal });
+    if (quiz !== token) return;
+    quiz.grade = { status: 'done', verdict: ['right', 'partial', 'wrong'].includes(r?.verdict) ? r.verdict : null, feedback: String(r?.feedback || ''), ctl: null };
+    quiz.revealed = true;
+  } catch (e) {
+    if (quiz !== token) return;
+    quiz.grade = e?.code === 'cancelled' ? freshGrade() : { ...freshGrade(), status: 'error', feedback: sampleErr(e) };
+    hideSampleIfDenied(e);
+  }
+  renderQuiz();
+}
+
+function closeQuiz() { quiz?.grade?.ctl?.abort(); quiz = null; if ($('#quizDlg').open) $('#quizDlg').close(); render(); }
+
+$('#quizBody').addEventListener('click', e => {
+  const act = e.target.closest('[data-q]')?.dataset.q; if (!act || !quiz) return;
+  const g = game(quiz.gameId);
+  if (act === 'grade') return gradeCurrent();
+  if (act === 'stopGrade') { quiz.grade.ctl?.abort(); return; }
+  if (act === 'reveal') { quiz.draft = $('#draft').value; quiz.revealed = true; }
+  if (act === 'right' || act === 'wrong') {
+    const ok = act === 'right';
+    const it = quiz.items[quiz.i];
+    const c = chapter(g, it.cid), q = question(c, it.qid);
+    if (q) q[ok ? 'right' : 'wrong']++;
+    quiz.results.push(ok); quiz.i++; quiz.revealed = false; quiz.draft = ''; quiz.grade = freshGrade();
+    if (quiz.i >= quiz.items.length && quiz.mode === 'boss' && quiz.results.every(Boolean)) {
+      const bc = chapter(g, quiz.chapterId);
+      if (bc && !bc.done) unlock(g, bc);
+    }
+    saveGame(g);
+  }
+  if (act === 'go') {
+    const r = quiz.results.filter(Boolean).length, n = quiz.items.length;
+    quiz = null; $('#quizDlg').close(); startTimer(g, `热身 ${r}/${n}`); return;
+  }
+  if (act === 'close') return closeQuiz();
+  renderQuiz();
+});
+$('#quizDlg').addEventListener('cancel', e => { e.preventDefault(); closeQuiz(); });
+
+function startTimer(g, warmup) {
+  settings.running = { gameId: g.id, start: Date.now(), warmup };
+  saveSettings(); render();
+}
+
+// ---------- Claude 出题 ----------
+let gen = null;
+
+function renderGen() {
+  const g = game(gen.gameId), c = chapter(g, gen.cid);
+  if (!c) { $('#genDlg').close(); gen = null; return; }
+  const body = $('#genBody');
+  body.innerHTML = `
+    <h2>✨ Claude 出题</h2>
+    <p class="note">${esc(g.name)} · ${esc(c.name)} · 题库现有 ${c.questions.length} 题</p>
+    <label for="genHint">侧重点（可空）</label>
+    <input id="genHint" maxlength="200" value="${esc(gen.hint)}" placeholder="例如：多考形状推导；或者：我对 stride 还不熟" ${gen.status === 'loading' ? 'readonly' : ''}>
+    ${gen.status === 'loading' ? `<p class="note">Claude 思考中，通常要十几秒到一分钟… <button class="link" data-g="stop">停止</button></p>` : ''}
+    ${gen.status === 'error' ? `<p class="err">${esc(gen.error)}</p>` : ''}
+    ${gen.items.length ? `<label>勾选要加入题库的题</label>${gen.items.map((x, i) => `
+      <label class="cand" for="cand_${i}" style="margin:0 0 6px"><input type="checkbox" id="cand_${i}" data-i="${i}" ${x.pick ? 'checked' : ''}>
+        <span><div class="q">${esc(x.q)}</div><div class="a">参考答案：${esc(x.a)}</div></span></label>`).join('')}` : ''}
+    <div class="row">
+      <button class="link" data-g="close" style="margin-right:auto">关闭</button>
+      <button class="ai" data-g="run" ${gen.status === 'loading' ? 'disabled' : ''}>${gen.items.length ? '换一批' : '出 3 道题'}</button>
+      ${gen.items.length ? `<button class="ok" data-g="add" ${gen.items.some(x => x.pick) ? '' : 'disabled'}>加入题库</button>` : ''}
+    </div>`;
+}
+
+async function runGen() {
+  const g = game(gen.gameId), c = chapter(g, gen.cid);
+  gen.hint = $('#genHint').value.trim();
+  const ctl = new AbortController();
+  const token = gen;
+  Object.assign(gen, { status: 'loading', error: '', ctl });
+  renderGen();
+  const existing = c.questions.map(q => '- ' + q.q.replace(/\n/g, ' ')).join('\n') || '（暂无）';
+  const weak = c.questions.filter(q => q.wrong > q.right).map(q => '- ' + q.q.replace(/\n/g, ' ')).join('\n');
+  const doneChapters = g.chapters.filter(x => x.done).map(x => x.name).join('、') || '（暂无）';
+  try {
+    const r = await sample.json(
+`你是一位严格但友善的出题老师。学习者背景：10 年 Java 后端工程师，正在转型大模型后训练 / RL 系统方向，同时在读 AI 在职硕士。
+
+请为下面这一章出 3 道新题。
+科目：${g.name}
+章节：${c.name}
+已完成的章节：${doneChapters}
+${gen.hint ? '学习者希望的侧重点：' + gen.hint + '\n' : ''}
+题库里已有的题（不要重复，也不要换个说法重复）：
+${existing}
+${weak ? '\n学习者答错较多的题（可以换一个角度再考同一个知识点）：\n' + weak + '\n' : ''}
+要求：
+- 简答题，1 到 3 分钟内能用几句话、一个式子或一个形状答出。
+- 优先考“结果的形状 / 数值是多少 / 每个位置从哪来 / 为什么”，少考纯名词记忆。
+- 不要出需要写完整代码的题；需要时可以在题目里给出几行代码让学习者推结果。
+- 参考答案简洁准确，1 到 3 句。拿不准的知识点不要出。
+- 用中文，代码和张量写法保持原样。
+
+只回复一个 JSON 数组：[{"q": "题目", "a": "参考答案"}, ...]`,
+      { signal: ctl.signal, cache: false });
+    if (gen !== token) return;
+    const items = (Array.isArray(r) ? r : []).filter(x => x && typeof x.q === 'string' && typeof x.a === 'string' && x.q.trim())
+      .slice(0, 5).map(x => ({ q: x.q.trim(), a: x.a.trim(), pick: true }));
+    Object.assign(gen, { status: items.length ? 'idle' : 'error', error: items.length ? '' : 'Claude 没给出可用的题，再试一次。', items, ctl: null });
+  } catch (e) {
+    if (gen !== token) return;
+    Object.assign(gen, { status: e?.code === 'cancelled' ? 'idle' : 'error', error: sampleErr(e), ctl: null });
+    hideSampleIfDenied(e);
+  }
+  if (gen === token) renderGen();
+}
+
+$('#genBody').addEventListener('click', e => {
+  const act = e.target.closest('[data-g]')?.dataset.g; if (!act || !gen) return;
+  if (act === 'run') return runGen();
+  if (act === 'stop') { gen.ctl?.abort(); return; }
+  if (act === 'close') { gen.ctl?.abort(); gen = null; $('#genDlg').close(); return; }
+  if (act === 'add') {
+    const g = game(gen.gameId), c = chapter(g, gen.cid);
+    const picked = gen.items.filter(x => x.pick);
+    for (const x of picked) c.questions.push({ id: uid(), q: x.q, a: x.a, by: 'claude', right: 0, wrong: 0 });
+    saveGame(g);
+    gen = null; $('#genDlg').close(); expanded = c.id; render();
+  }
+});
+$('#genBody').addEventListener('change', e => {
+  if (e.target.dataset.i != null && gen) { gen.items[+e.target.dataset.i].pick = e.target.checked; renderGen(); }
+});
+$('#genDlg').addEventListener('cancel', e => { e.preventDefault(); gen?.ctl?.abort(); gen = null; $('#genDlg').close(); });
+
+// ---------- events ----------
+$('#list').addEventListener('click', e => {
+  const el = e.target.closest('.game'); if (!el) return;
+  select(el.dataset.id); expanded = null; render();
+});
+
+$('#detail').addEventListener('click', async e => {
+  const btn = e.target.closest('[data-act]'); if (!btn) return;
+  const g = game(selected); if (!g) return;
+  const c = btn.dataset.ch ? chapter(g, btn.dataset.ch) : null;
+  const act = btn.dataset.act;
+  if (readOnly && !['toggleQ'].includes(act)) return;
+  switch (act) {
+    case 'play': return startQuiz('warmup', g);
+    case 'stop': {
+      const minutes = Math.max(1, Math.round((Date.now() - settings.running.start) / 60000));
+      const r = await ask({ title: '本次游戏结束', body: `${g.name} · 本次 ${minutes} 分钟`, ok: '保存 DLC', cancel: '继续玩', fields: [
+        { name: 'name', label: '给这个 DLC 起个名字', required: true, placeholder: '这次练了什么？' },
+        { name: 'note', label: '备注', type: 'textarea', rows: 3, value: settings.running.warmup || '' },
+      ]});
+      if (!r) return;
+      g.dlcs.push({ id: uid(), name: r.name.trim(), date: today(), minutes, note: r.note.trim() });
+      settings.running = null; saveGame(g); saveSettings(); break;
+    }
+    case 'addDlc': {
+      const r = await ask({ title: '记录 DLC（一次练习）', ok: '保存', fields: [
+        { name: 'name', label: 'DLC 名称', required: true, placeholder: '例如：手写 MLP 跑通 MNIST' },
+        { name: 'date', label: '日期', type: 'date', required: true, value: today() },
+        { name: 'minutes', label: '时长（分钟）', type: 'number', min: 1, required: true },
+        { name: 'note', label: '备注', type: 'textarea', rows: 3, placeholder: '踩了什么坑、学到了什么' },
+      ]});
+      if (!r) return;
+      g.dlcs.push({ id: uid(), name: r.name.trim(), date: r.date, minutes: Math.max(1, Math.round(+r.minutes)), note: r.note.trim() });
+      saveGame(g); break;
+    }
+    case 'delDlc': {
+      const d = g.dlcs.find(x => x.id === btn.dataset.dlc);
+      if (!d || !await ask({ title: '删除这条 DLC？', body: `${d.name} · ${fmtH(d.minutes)} 小时`, ok: '删除', danger: true })) return;
+      g.dlcs = g.dlcs.filter(x => x !== d); saveGame(g); break;
+    }
+    case 'delGame': {
+      if (!await ask({ title: `移除「${g.name}」？`, body: `它的 ${g.dlcs.length} 个 DLC、${g.chapters.length} 个章节和全部题目都会删除。可以先导出存档备份。`, ok: '移除', danger: true })) return;
+      games = games.filter(x => x !== g);
+      if (settings.running?.gameId === g.id) { settings.running = null; saveSettings(); }
+      deleteGame(g.id); select(games[0]?.id || null); break;
+    }
+    case 'addCh': {
+      const r = await ask({ title: '添加章节', ok: '添加', fields: [{ name: 'name', label: '章节名称', required: true, placeholder: '例如：机器学习基础 / 2. 形状与数值' }] });
+      if (!r) return;
+      g.chapters.push({ id: uid(), name: r.name.trim(), done: false, doneDate: null, questions: [] }); saveGame(g); break;
+    }
+    case 'renameCh': {
+      const r = await ask({ title: '章节改名', ok: '保存', fields: [{ name: 'name', label: '章节名称', required: true, value: c.name }] });
+      if (!r) return;
+      c.name = r.name.trim(); saveGame(g); break;
+    }
+    case 'delCh': {
+      if (!await ask({ title: `删除章节「${c.name}」？`, body: `它的 ${c.questions.length} 道题也会删除。`, ok: '删除', danger: true })) return;
+      g.chapters = g.chapters.filter(x => x !== c); saveGame(g); break;
+    }
+    case 'boss': return startQuiz('boss', g, c);
+    case 'mark': unlock(g, c); saveGame(g); break;
+    case 'unmark': c.done = false; c.doneDate = null; saveGame(g); break;
+    case 'toggleQ': expanded = expanded === c.id ? null : c.id; return renderDetail();
+    case 'addQ': {
+      const r = await ask({ title: '我来出题', body: `章节：${c.name}`, ok: '加入题库', fields: [
+        { name: 'q', label: '题目', type: 'textarea', required: true, placeholder: '例如：x.sum(dim=1, keepdim=True).shape = ?' },
+        { name: 'a', label: '参考答案', type: 'textarea', required: true },
+      ]});
+      if (!r) return;
+      c.questions.push({ id: uid(), q: r.q.trim(), a: r.a.trim(), by: 'me', right: 0, wrong: 0 }); saveGame(g); break;
+    }
+    case 'genQ':
+      gen = { gameId: g.id, cid: c.id, hint: '', items: [], status: 'idle', error: '', ctl: null };
+      renderGen(); $('#genDlg').showModal(); return;
+    case 'delQ': {
+      const q = question(c, btn.dataset.q);
+      if (!q || !await ask({ title: '删除这道题？', body: q.q, ok: '删除', danger: true })) return;
+      c.questions = c.questions.filter(x => x !== q); saveGame(g); break;
+    }
+  }
+  render();
+});
+
+$('#addGame').onclick = async () => {
+  if (readOnly || !db) return;
+  const r = await ask({ title: '添加游戏', ok: '添加到库', fields: [
+    { name: 'name', label: '名称（科目 / 研究方向）', required: true, placeholder: '例如：硕士课程' },
+    { name: 'emoji', label: '图标（一个 emoji）', value: '🎮', max: 4 },
+    { name: 'color', label: '主题色', type: 'color', value: '#2a6f97' },
+  ]});
+  if (!r) return;
+  const g = { id: uid(), name: r.name.trim(), emoji: r.emoji || '🎮', color: r.color, created: today(), dlcs: [], chapters: [] };
+  games.push(g); select(g.id); saveGame(g); render();
+};
+
+$('#goalBtn').onclick = async () => {
+  if (readOnly || !db) return;
+  const r = await ask({ title: '设置目标', ok: '保存', fields: [
+    { name: 'start', label: '计划起始日期', type: 'date', required: true, value: settings.start },
+    ...settings.goals.map((g, i) => ({ name: 'h' + i, label: `「${g.name}」目标小时数（${g.years} 年）`, type: 'number', min: 1, required: true, value: g.hours })),
+  ]});
+  if (!r) return;
+  settings.start = r.start;
+  settings.goals = settings.goals.map((g, i) => ({ ...g, hours: Math.max(1, Math.round(+r['h' + i]) || g.hours) }));
+  saveSettings(); render();
+};
+
+$('#exportBtn').onclick = async () => {
+  const data = JSON.stringify({ exported: today(), settings, games }, null, 2);
+  if (!downloads) { showBanner('这个视图不能下载文件。'); return; }
+  try { await downloads.save({ filename: `study-steam-${today()}.json`, data }); }
+  catch (e) { if (e?.code !== 'declined') showBanner('导出失败（' + (e?.code || '未知') + '）。'); }
+};
+$('#importBtn').onclick = () => { if (!readOnly && db) $('#importFile').click(); };
+$('#importFile').onchange = async e => {
+  const file = e.target.files[0]; e.target.value = ''; if (!file) return;
+  let s;
+  try { s = JSON.parse(await file.text()); if (!Array.isArray(s.games)) throw 0; }
+  catch { showBanner('导入失败：这不是本页导出的存档文件。'); return; }
+  if (!await ask({ title: '导入存档？', body: `文件里有 ${s.games.length} 款游戏。同 id 的游戏会被覆盖，其他游戏保留。`, ok: '导入' })) return;
+  for (const raw of s.games) {
+    const g = { id: raw.id || uid(), name: String(raw.name || '未命名'), emoji: raw.emoji || '🎮', color: raw.color || '#2a6f97', created: raw.created || today(),
+      dlcs: Array.isArray(raw.dlcs) ? raw.dlcs : [],
+      chapters: (raw.chapters || []).map(c => ({ ...c, questions: (c.questions || []).map(q => ({ by: 'claude', right: 0, wrong: 0, ...q })) })) };
+    games = games.filter(x => x.id !== g.id).concat(g); saveGame(g);
+  }
+  const st = s.settings || (s.goals ? { start: s.start, goals: s.goals } : null);
+  if (st?.goals) { settings = { ...settings, start: st.start || settings.start, goals: st.goals }; saveSettings(); }
+  render();
+};
+
+// ---------- boot ----------
+render();
+(async () => {
+  const use = n => window.claude?.use ? window.claude.use(n).catch(() => null) : Promise.resolve(null);
+  [db, sample, downloads] = await Promise.all([use('db'), use('sample'), use('downloads')]);
+  if (!db) {
+    loaded.games = true;
+    showBanner('读不到云端存档。请登录 claude.ai 后在这里打开这个页面。');
+    $('#syncNote').textContent = '云端存档不可用';
+    render(); return;
+  }
+  db.collection('games').onSnapshot(snap => {
+    games = snap.docs.map(d => ({ id: d.id, dlcs: [], chapters: [], ...clone(d.data()) }));
+    for (const g of games) for (const c of g.chapters) c.questions = c.questions || [];
+    loaded.games = true;
+    render();
+  }, e => showBanner('云端存档连接中断（' + e.code + '），刷新页面重试。'));
+  db.doc('meta/settings').onSnapshot(snap => {
+    settings = snap.exists ? { ...clone(DEFAULT_SETTINGS), ...clone(snap.data()) } : clone(DEFAULT_SETTINGS);
+    loaded.settings = true;
+    render();
+  }, () => {});
+})();
+</script>
