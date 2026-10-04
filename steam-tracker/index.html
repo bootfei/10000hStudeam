@@ -11,18 +11,22 @@
     --mono: "SF Mono", Menlo, Consolas, "PingFang SC", monospace;
   }
   * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
   html, body { background: var(--bg); }
   body { margin: 0; color: var(--text); font: 14px/1.5 var(--font); }
   button { font: inherit; cursor: pointer; border: 0; border-radius: 2px; color: inherit; }
   button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px solid var(--blue); outline-offset: 1px; }
   button:disabled { opacity: .45; cursor: not-allowed; }
-  input, textarea { font: inherit; background: var(--well); color: var(--text);
+  input, textarea, select { font: inherit; background: var(--well); color: var(--text);
     border: 1px solid var(--line); border-radius: 2px; padding: 6px 8px; width: 100%; }
 
   header { background: var(--top); display: flex; align-items: center; gap: 28px; padding: 0 24px; height: 64px; }
   .logo { font-weight: 800; letter-spacing: 2px; font-size: 20px; color: var(--white); }
   .logo span { color: var(--blue); }
-  nav span { color: var(--blue); font-weight: 700; letter-spacing: 1px; margin-right: 18px; font-size: 15px; }
+  nav { display: flex; gap: 18px; align-self: stretch; }
+  nav button { background: none; color: var(--dim); font-weight: 700; letter-spacing: 1px; font-size: 15px; padding: 0 2px; border-radius: 0; border-bottom: 3px solid transparent; }
+  nav button:hover { color: var(--white); }
+  nav button.on { color: var(--blue); border-bottom-color: var(--blue); }
   .profile { margin-left: auto; text-align: right; font-size: 12px; color: var(--dim); }
   .profile b { color: var(--white); font-size: 14px; }
   .lvl { display: inline-block; border: 2px solid var(--gold); border-radius: 50%; width: 30px; height: 30px;
@@ -105,7 +109,7 @@
   dialog .row { display: flex; gap: 8px; justify-content: flex-end; margin-top: 18px; align-items: center; flex-wrap: wrap; }
   .ok { background: linear-gradient(90deg, var(--green1), var(--green2)); color: var(--white); padding: 8px 18px; }
   .no { background: linear-gradient(90deg, var(--red1), var(--red2)); color: var(--white); padding: 8px 18px; }
-  #quizDlg, #genDlg { width: min(640px, 94vw); }
+  #quizDlg, #genDlg, dialog.wide { width: min(640px, 94vw); }
   .qhead { display: flex; justify-content: space-between; gap: 12px; font-size: 12px; color: var(--dim); letter-spacing: 1px; }
   .qdots { display: flex; gap: 4px; margin: 8px 0 16px; }
   .qdots i { flex: 1; height: 4px; background: var(--well); }
@@ -139,6 +143,40 @@
   @keyframes fade { to { opacity: 0; transform: translateY(20px); } }
   @media (prefers-reduced-motion: reduce) { .toast { animation: none; } }
 
+  /* calendar */
+  .calwrap { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 24px; padding: 24px 32px; align-items: start; }
+  .calhead { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+  .calhead h2 { margin: 0; flex: 1; }
+  .cal { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+  .cal .wd { font-size: 12px; color: var(--dim); text-align: center; padding: 4px 0; }
+  .cell { min-height: 78px; background: var(--panel2); padding: 6px; text-align: left; display: flex; flex-direction: column; gap: 4px; border: 1px solid transparent; position: relative; border-radius: 2px; min-width: 0; }
+  .cell:hover { border-color: var(--line); }
+  .cell.out { opacity: .35; }
+  .cell.today { border-color: var(--blue); }
+  .cell.sel { outline: 2px solid var(--white); outline-offset: -1px; }
+  .cell.rest { background: #1d2533; }
+  .cell.pass { background: linear-gradient(180deg, rgba(117,176,34,.22), var(--panel2)); }
+  .cell .n { font-size: 12px; color: var(--dim); }
+  .cell.today .n { color: var(--blue); font-weight: 700; }
+  .cell .hrs { font-size: 13px; color: var(--white); font-variant-numeric: tabular-nums; }
+  .cell .heat { height: 4px; background: var(--well); display: block; }
+  .cell .heat i { display: block; height: 100%; background: var(--green1); }
+  .cell .dots { display: flex; gap: 3px; }
+  .cell .dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--well); }
+  .cell .dots i.on { background: var(--green1); }
+  .cell .cico { position: absolute; right: 5px; top: 3px; font-size: 14px; }
+  .cell .tag { font-size: 11px; color: var(--gold); }
+  .pill { font-size: 11px; padding: 1px 8px; border-radius: 10px; background: var(--well); color: var(--dim); letter-spacing: 0; font-weight: 400; white-space: nowrap; }
+  .pill.ok { background: rgba(117,176,34,.2); color: var(--green1); }
+  .pill.rest { background: rgba(229,177,67,.15); color: var(--gold); }
+  .task { display: flex; gap: 8px; align-items: flex-start; padding: 6px 0; border-bottom: 1px solid #22303f; }
+  .task input { width: auto; margin-top: 4px; }
+  .task .tt { flex: 1; min-width: 0; display: grid; overflow-wrap: anywhere; cursor: pointer; }
+  .task .done { text-decoration: line-through; color: var(--dim); }
+  .taskadd { display: grid; gap: 6px; margin-top: 10px; }
+  .weekbar { display: grid; gap: 8px; margin-top: 12px; }
+  .wpday { font-size: 14px; color: var(--white); margin: 16px 0 6px; display: flex; justify-content: space-between; gap: 8px; }
+
   footer { padding: 12px 24px; display: flex; gap: 8px; background: var(--top); font-size: 12px; color: var(--dim); align-items: center; flex-wrap: wrap; }
   #banner { background: #3a2a14; color: var(--gold); padding: 10px 24px; font-size: 13px; }
 
@@ -151,7 +189,11 @@
     .hero { padding: 16px; height: 140px; }
     .hero h1 { font-size: 26px; }
     .playbar { padding: 16px; gap: 16px; }
-    header nav { display: none; }
+    nav { gap: 12px; } nav button { font-size: 14px; }
+    .logo { font-size: 16px; }
+    .calwrap { grid-template-columns: minmax(0, 1fr); padding: 16px; }
+    .cell { min-height: 54px; padding: 4px; }
+    .cell .hrs { font-size: 11px; }
     .qlist { margin-left: 0; }
     footer { padding: 12px 16px; }
   }
@@ -159,18 +201,19 @@
 
 <header>
   <div class="logo">STUDY<span>STEAM</span></div>
-  <nav><span>库</span><span>成就</span></nav>
+  <nav><button data-view="lib">库</button><button data-view="cal">日历</button></nav>
   <div class="profile" id="profile"></div>
 </header>
 <div id="banner" hidden></div>
 <section class="goal" id="goal"></section>
-<main>
+<main id="libView">
   <aside>
     <h3>游戏库（科目）<button id="addGame" title="添加游戏" aria-label="添加游戏">＋</button></h3>
     <div id="list"></div>
   </aside>
   <section id="detail"></section>
 </main>
+<section id="calView" hidden></section>
 <footer>
   <button class="ghost" id="exportBtn">导出存档 JSON</button>
   <button class="ghost" id="importBtn">导入存档</button>
@@ -183,6 +226,9 @@
 <dialog id="askDlg"><form id="askForm"></form></dialog>
 <dialog id="quizDlg"><div id="quizBody"></div></dialog>
 <dialog id="genDlg"><div id="genBody"></div></dialog>
+<dialog id="dqDlg" class="wide"><div id="dqBody"></div></dialog>
+<dialog id="tsDlg" class="wide"><div id="tsBody"></div></dialog>
+<dialog id="wpDlg" class="wide"><div id="wpBody"></div></dialog>
 
 <script>
 const uid = () => Math.random().toString(36).slice(2, 10);
@@ -201,7 +247,7 @@ const HOUR_ACHIEVEMENTS = [
   [1000, '👑', '千锤百炼', '累计 1000 小时'],
 ];
 const WARMUP_SIZE = 3;
-const DEFAULT_SETTINGS = { start: '2026-11-01', running: null, goals: [
+const DEFAULT_SETTINGS = { start: '2026-11-01', running: null, dailyTargetMin: 240, restDays: [0], quizCount: 5, quizPass: 4, goals: [
   { name: '2 年 · 硕士期间', hours: 2500, years: 2 },
   { name: '5 年 · 终极目标', hours: 10000, years: 5 },
 ]};
@@ -212,7 +258,8 @@ let games = [];                 // [{id, name, emoji, color, created, chapters, 
 let settings = clone(DEFAULT_SETTINGS);
 let loaded = { games: false, settings: false };
 let readOnly = false;
-let selected = null;
+let selected = null, view = 'lib';
+try { view = localStorage.getItem('study-steam-view') || 'lib'; } catch (e) {}
 try { selected = localStorage.getItem('study-steam-selected'); } catch (e) {}
 const select = id => { selected = id; try { localStorage.setItem('study-steam-selected', id || ''); } catch (e) {} };
 
@@ -284,6 +331,10 @@ function ask({ title, body = '', fields = [], ok = '确定', danger = false, can
 let expanded = null;
 
 function render() {
+  $('#libView').hidden = view !== 'lib';
+  $('#calView').hidden = view !== 'cal';
+  document.querySelectorAll('nav [data-view]').forEach(b => b.classList.toggle('on', b.dataset.view === view));
+  if (view === 'cal') renderCalendar();
   const total = totalMins();
   const recent = games.reduce((a, g) => a + recentMins(g), 0);
   const elapsedWeeks = Math.max(0, (Date.now() - new Date(settings.start)) / 864e5 / 7);
@@ -294,6 +345,7 @@ function render() {
   $('#goal').innerHTML = `
     <div class="stat">总游戏时长<b>${fmtH(total)} h</b></div>
     <div class="stat">过去两周<b>${fmtH(recent)} h</b></div>
+    <div class="stat">连续通关<b>${streak()} 天</b></div>
     <div class="stat">题库<b>${allQ.length}</b></div>
     ${settings.goals.map(goal => {
       const pct = Math.min(100, total / 60 / goal.hours * 100);
@@ -519,6 +571,25 @@ const SAMPLE_ERR = {
 const sampleErr = e => SAMPLE_ERR[e?.code] || 'Claude 暂时没有回应，再试一次。';
 const hideSampleIfDenied = e => { if (['not_granted', 'sampling_disabled', 'not_declared', 'capability_disabled', 'capability_removed'].includes(e?.code)) { sample = null; render(); } };
 
+function claudeGrade({ subject, chapter, q, a, answer, signal }) {
+  return sample.json(
+`你在批改一道简答题。判断学习者的回答是否抓住了参考答案的要点：措辞不同没关系，但关键的数值、形状、原因必须对。
+
+科目：${subject}
+章节：${chapter}
+题目：
+${q}
+
+参考答案：
+${a}
+
+学习者的回答：
+${answer}
+
+只回复一个 JSON 对象：{"verdict": "right" | "partial" | "wrong", "feedback": "一到三句中文点评：对在哪里、错在哪里、漏了什么"}`,
+    { signal }).then(r => ({ verdict: ['right', 'partial', 'wrong'].includes(r?.verdict) ? r.verdict : null, feedback: String(r?.feedback || '') }));
+}
+
 async function gradeCurrent() {
   const g = game(quiz.gameId), it = quiz.items[quiz.i];
   const c = chapter(g, it.cid), q = question(c, it.qid);
@@ -529,24 +600,9 @@ async function gradeCurrent() {
   quiz.grade = { status: 'loading', verdict: null, feedback: '', ctl };
   renderQuiz();
   try {
-    const r = await sample.json(
-`你在批改一道简答题。判断学习者的回答是否抓住了参考答案的要点：措辞不同没关系，但关键的数值、形状、原因必须对。
-
-科目：${g.name}
-章节：${c.name}
-题目：
-${q.q}
-
-参考答案：
-${q.a}
-
-学习者的回答：
-${quiz.draft}
-
-只回复一个 JSON 对象：{"verdict": "right" | "partial" | "wrong", "feedback": "一到三句中文点评：对在哪里、错在哪里、漏了什么"}`,
-      { signal: ctl.signal });
+    const r = await claudeGrade({ subject: g.name, chapter: c.name, q: q.q, a: q.a, answer: quiz.draft, signal: ctl.signal });
     if (quiz !== token) return;
-    quiz.grade = { status: 'done', verdict: ['right', 'partial', 'wrong'].includes(r?.verdict) ? r.verdict : null, feedback: String(r?.feedback || ''), ctl: null };
+    quiz.grade = { status: 'done', verdict: r.verdict, feedback: r.feedback, ctl: null };
     quiz.revealed = true;
   } catch (e) {
     if (quiz !== token) return;
@@ -784,7 +840,7 @@ $('#goalBtn').onclick = async () => {
 };
 
 $('#exportBtn').onclick = async () => {
-  const data = JSON.stringify({ exported: today(), settings, games }, null, 2);
+  const data = JSON.stringify({ exported: today(), settings, games, days: Object.values(days) }, null, 2);
   if (!downloads) { showBanner('这个视图不能下载文件。'); return; }
   try { await downloads.save({ filename: `study-steam-${today()}.json`, data }); }
   catch (e) { if (e?.code !== 'declined') showBanner('导出失败（' + (e?.code || '未知') + '）。'); }
@@ -802,10 +858,632 @@ $('#importFile').onchange = async e => {
       chapters: (raw.chapters || []).map(c => ({ ...c, questions: (c.questions || []).map(q => ({ by: 'claude', right: 0, wrong: 0, ...q })) })) };
     games = games.filter(x => x.id !== g.id).concat(g); saveGame(g);
   }
+  for (const raw of Array.isArray(s.days) ? s.days : []) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(raw?.date || '')) continue;
+    saveDay({ date: raw.date, targetMin: raw.targetMin ?? settings.dailyTargetMin, tasks: raw.tasks || [], attempts: raw.attempts || [] });
+  }
   const st = s.settings || (s.goals ? { start: s.start, goals: s.goals } : null);
   if (st?.goals) { settings = { ...settings, start: st.start || settings.start, goals: st.goals }; saveSettings(); }
   render();
 };
+
+// ---------- 日历：每日关卡 ----------
+// 每天三个条件：时长达标、任务全部勾完、每日测验通过（Claude 出题 + Claude 批改）。主日不设目标，也不打断连续天数。
+let days = {};          // date -> {date, targetMin, tasks, attempts}
+let calMonth = today().slice(0, 7), calSel = today();
+const WEEK = ['日', '一', '二', '三', '四', '五', '六'];
+const weekday = date => new Date(date + 'T00:00:00').getDay();
+const isRest = date => (settings.restDays || []).includes(weekday(date));
+const addDays = (date, n) => { const d = new Date(date + 'T00:00:00'); d.setDate(d.getDate() + n); return new Date(d - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 10); };
+const dayMins = date => games.reduce((a, g) => a + g.dlcs.filter(d => d.date === date).reduce((s, d) => s + d.minutes, 0), 0);
+const ensureDay = date => days[date] || { date, targetMin: settings.dailyTargetMin, tasks: [], attempts: [] };
+const saveDay = d => { days[d.date] = d; put('days/' + d.date, () => { const { date: _, ...body } = d; return clone(body); }); };
+
+function dayStatus(date) {
+  const d = days[date];
+  const rest = isRest(date);
+  const target = rest ? 0 : (d?.targetMin ?? settings.dailyTargetMin);
+  const minutes = dayMins(date);
+  const tasks = d?.tasks || [];
+  const timeOk = minutes >= target;
+  const tasksOk = tasks.length > 0 && tasks.every(t => t.done);
+  const quizOk = (d?.attempts || []).some(a => a.passed);
+  return { rest, target, minutes, tasks, timeOk, tasksOk, quizOk, passed: !rest && timeOk && tasksOk && quizOk };
+}
+
+function streak() {
+  let date = today(), n = 0;
+  if (!dayStatus(date).passed) date = addDays(date, -1);
+  for (let k = 0; k < 3650; k++, date = addDays(date, -1)) {
+    const s = dayStatus(date);
+    if (s.rest) continue;
+    if (!s.passed) break;
+    n++;
+  }
+  return n;
+}
+
+// 某个操作前后对比，刚通关就弹成就
+function celebrate(date, wasPassed) {
+  if (!wasPassed && dayStatus(date).passed) toast('🏆', '今日通关', `${date} · 连续 ${streak()} 天`);
+}
+
+function setView(v) {
+  view = v;
+  try { localStorage.setItem('study-steam-view', v); } catch (e) {}
+  render();
+}
+
+function renderCalendar() {
+  const el = $('#calView');
+  // 重绘会重建输入框，先记下正在写的任务
+  const keep = { text: $('#taskText')?.value || '', ch: $('#taskCh')?.value || '', focus: document.activeElement?.id === 'taskText' };
+  const [y, m] = calMonth.split('-').map(Number);
+  const first = `${calMonth}-01`;
+  const start = addDays(first, -((weekday(first) + 6) % 7)); // 周一开头
+  const cells = Array.from({ length: 42 }, (_, i) => addDays(start, i));
+  while (cells.length > 35 && cells.slice(-7).every(d => d.slice(0, 7) !== calMonth)) cells.splice(-7);
+  const t = today();
+  el.innerHTML = `<div class="calwrap">
+    <div class="card">
+      <div class="calhead">
+        <button class="ghost" data-c="prev" aria-label="上个月">‹</button>
+        <h2>${y} 年 ${m} 月</h2>
+        <button class="ghost" data-c="today">今天</button>
+        <button class="ghost" data-c="next" aria-label="下个月">›</button>
+      </div>
+      <div class="cal">
+        ${['一', '二', '三', '四', '五', '六', '日'].map(w => `<div class="wd">${w}</div>`).join('')}
+        ${cells.map(date => {
+          const s = dayStatus(date), future = date > t;
+          return `<button class="cell ${date.slice(0, 7) !== calMonth ? 'out' : ''} ${date === t ? 'today' : ''} ${date === calSel ? 'sel' : ''} ${s.rest ? 'rest' : ''} ${s.passed ? 'pass' : ''}" data-c="sel" data-date="${date}">
+            <span class="n">${+date.slice(8)}</span>
+            ${s.passed ? '<span class="cico">🏆</span>' : ''}
+            ${s.rest
+              ? `<span class="tag">主日</span>${s.minutes ? `<span class="hrs">${fmtH(s.minutes)}h</span>` : ''}`
+              : `<span class="hrs">${s.minutes ? fmtH(s.minutes) + 'h' : future ? '' : '—'}</span>
+                 <span class="heat"><i style="width:${s.target ? Math.min(100, s.minutes / s.target * 100) : 0}%"></i></span>
+                 ${future && !s.tasks.length ? '' : `<span class="dots"><i class="${s.timeOk ? 'on' : ''}"></i><i class="${s.tasksOk ? 'on' : ''}"></i><i class="${s.quizOk ? 'on' : ''}"></i></span>`}`}
+          </button>`;
+        }).join('')}
+      </div>
+      <div class="note" style="margin-top:10px">三个圆点依次是：时长、任务、测验，三项都亮才算通关 🏆。主日不设目标，也不打断连续天数。</div>
+      ${renderWeekNote()}
+    </div>
+    ${renderDayPanel(calSel)}
+  </div>`;
+  if ($('#taskText')) {
+    $('#taskText').value = keep.text;
+    if (keep.ch) $('#taskCh').value = keep.ch;
+    if (keep.focus) $('#taskText').focus();
+  }
+}
+
+function renderWeekNote() {
+  const mon = mondayOf(calSel), w = weeks[mon];
+  return `<div class="weekbar">
+    ${w ? `<div class="qai" style="margin:0"><b>${+mon.slice(5, 7)} 月 ${+mon.slice(8)} 日这周的计划说明</b>${esc(w.review)}</div>` : ''}
+    ${sample ? `<div class="qbar"><button class="ai" data-c="plan" ${readOnly ? 'disabled' : ''}>✨ 复盘这周，排下周</button><span class="note">复盘选中日期所在的这一周</span></div>` : ''}
+  </div>`;
+}
+
+function renderDayPanel(date) {
+  const s = dayStatus(date), t = today();
+  const isToday = date === t, future = date > t;
+  const title = `${+date.slice(5, 7)} 月 ${+date.slice(8)} 日 · 周${WEEK[weekday(date)]}`;
+  const dl = games.flatMap(g => g.dlcs.filter(d => d.date === date).map(d => ({ g, d })));
+  const dlHtml = dl.map(({ g, d }) => `<div class="split"><span>${esc(g.emoji)} ${esc(g.name)} · ${esc(d.name)}</span><b>${fmtH(d.minutes)}h</b></div>`).join('');
+  if (s.rest) return `<div class="col"><div class="card"><h2>${title}<span class="pill rest">主日</span></h2>
+    <p>今天是主日，安息敬拜。不设学习目标，也不影响连续通关天数。</p>${dlHtml}</div></div>`;
+  const pill = ok => `<span class="pill ${ok ? 'ok' : ''}">${ok ? '✓ 达成' : '未达成'}</span>`;
+  const attempts = days[date]?.attempts || [];
+  const last = attempts[attempts.length - 1];
+  const inProgress = last && !last.done;
+  const chapterOpts = games.flatMap(g => g.chapters.map(c => `<option value="${g.id}|${c.id}">${esc(g.name)} / ${esc(c.name)}</option>`)).join('');
+  return `<div class="col">
+    <div class="card"><h2>${title}${s.passed ? '<span class="pill ok">🏆 今日通关</span>' : future ? '<span class="pill">计划中</span>' : ''}</h2>
+      <div class="note">连续通关 <b style="color:var(--white)">${streak()}</b> 天</div></div>
+    <div class="card"><h2>① 时长 ${fmtH(s.minutes)} / ${fmtH(s.target)} h ${pill(s.timeOk)}</h2>
+      <div class="track"><div class="fill" style="width:${s.target ? Math.min(100, s.minutes / s.target * 100) : 100}%"></div></div>
+      <div style="margin-top:8px">${dlHtml || '<div class="note">这一天还没有 DLC 记录。时长来自游戏库里记的 DLC。</div>'}</div>
+      ${isToday ? '<div class="qbar"><button class="ghost" data-c="goLib">去游戏库开始游戏</button></div>' : ''}
+    </div>
+    <div class="card"><h2>② 任务 ${s.tasks.filter(x => x.done).length} / ${s.tasks.length} ${pill(s.tasksOk)}</h2>
+      ${s.tasks.map(tk => {
+        const g = game(tk.gameId), c = chapter(g, tk.chapterId);
+        return `<div class="task"><input type="checkbox" id="tk_${tk.id}" data-c="toggleTask" data-t="${tk.id}" ${tk.done ? 'checked' : ''} ${future || readOnly ? 'disabled' : ''}>
+          <label class="tt" for="tk_${tk.id}"><span class="${tk.done ? 'done' : ''}">${esc(tk.text)}</span>${c ? `<span class="note">${esc(g.name)} / ${esc(c.name)}</span>` : ''}</label>
+          <button class="link" data-c="delTask" data-t="${tk.id}">删</button></div>`;
+      }).join('') || '<div class="note">还没有任务。至少写一条，任务全部勾完才算达成。</div>'}
+      ${date >= t ? `<form class="taskadd" id="taskForm">
+        <label for="taskText" class="note">添加任务</label>
+        <input id="taskText" maxlength="200" placeholder="例如：做完手册练习 4.1、4.2" required>
+        <select id="taskCh" aria-label="关联章节"><option value="">不关联章节</option>${chapterOpts}</select>
+        <div class="qbar"><button class="ghost">＋ 添加任务</button>${sample ? '<button type="button" class="ai" data-c="suggest">✨ Claude 建议任务</button>' : ''}</div>
+      </form>` : ''}
+    </div>
+    <div class="card"><h2>③ 每日测验 ${pill(s.quizOk)}</h2>
+      <div class="note">Claude 根据当天任务现场出 ${settings.quizCount} 道新题并逐题批改，判对 ${settings.quizPass} 道及以上算通过，“部分正确”不算对。没过可以重考，每次换一批新题。答错的题会收进对应章节的题库。</div>
+      ${attempts.filter(a => a.done).map((a, i) => `<div class="split"><span>第 ${i + 1} 次 · ${esc(a.at)}</span><b style="color:${a.passed ? 'var(--green1)' : 'var(--red)'}">${a.right} / ${a.items.length} ${a.passed ? '通过' : '未通过'}</b></div>`).join('')}
+      <div class="qbar">${isToday
+        ? sample
+          ? `<button class="${s.quizOk ? 'ghost' : 'ai'}" data-c="quiz" ${readOnly ? 'disabled' : ''}>${inProgress ? '继续测验' : s.quizOk ? '再考一次' : attempts.length ? '重考（换一批新题）' : '开始测验'}</button>`
+          : '<span class="note">每日测验需要 Claude：请在 claude.ai 登录后打开本页，并允许它使用 Claude。</span>'
+        : future ? '<span class="note">测验当天才能开始。</span>' : ''}</div>
+    </div>
+  </div>`;
+}
+
+$('#calView').addEventListener('click', e => {
+  const b = e.target.closest('[data-c]'); if (!b) return;
+  const act = b.dataset.c;
+  if (act === 'toggleTask') return; // 交给 change 处理
+  if (act === 'prev' || act === 'next') {
+    const [y, m] = calMonth.split('-').map(Number);
+    const d = new Date(y, m - 1 + (act === 'next' ? 1 : -1), 1);
+    calMonth = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+  }
+  if (act === 'today') { calSel = today(); calMonth = calSel.slice(0, 7); }
+  if (act === 'sel') { calSel = b.dataset.date; calMonth = calSel.slice(0, 7); }
+  if (act === 'goLib') return setView('lib');
+  if (act === 'delTask') {
+    if (readOnly) return;
+    const d = days[calSel]; if (!d) return;
+    const was = dayStatus(calSel).passed;
+    d.tasks = d.tasks.filter(x => x.id !== b.dataset.t); saveDay(d); celebrate(calSel, was);
+  }
+  if (act === 'suggest') return openSuggest(calSel);
+  if (act === 'plan') return openPlan(calSel);
+  if (act === 'quiz') return startDaily(calSel);
+  renderCalendar();
+});
+$('#calView').addEventListener('change', e => {
+  if (e.target.dataset.c !== 'toggleTask' || readOnly) return;
+  const d = days[calSel]; const tk = d?.tasks.find(x => x.id === e.target.dataset.t); if (!tk) return;
+  const was = dayStatus(calSel).passed;
+  tk.done = e.target.checked; saveDay(d); celebrate(calSel, was); render();
+});
+$('#calView').addEventListener('submit', e => {
+  if (e.target.id !== 'taskForm') return;
+  e.preventDefault();
+  if (readOnly || !db) return;
+  const text = $('#taskText').value.trim(); if (!text) return;
+  const [gameId, chapterId] = ($('#taskCh').value || '|').split('|');
+  const d = ensureDay(calSel);
+  d.tasks.push({ id: uid(), text, gameId: gameId || null, chapterId: chapterId || null, done: false });
+  saveDay(d);
+  $('#taskText').value = '';
+  render();
+  $('#taskText')?.focus();
+});
+
+// ---------- 每日测验 ----------
+let dq = null; // {date, status: 'generating'|'answer'|'grading'|'error', error, ctl, draft, review}
+const curAttempt = () => { const a = days[dq?.date]?.attempts; return a?.[a.length - 1]; };
+
+function quizScope(date) {
+  const linked = dayStatus(date).tasks.map(t => { const g = game(t.gameId); return { g, c: chapter(g, t.chapterId) }; }).filter(x => x.c);
+  const scope = linked.length ? linked : games.flatMap(g => { const cur = g.chapters.find(c => !c.done); return cur ? [{ g, c: cur }] : []; });
+  const seen = new Set();
+  return scope.filter(x => !seen.has(x.c.id) && seen.add(x.c.id));
+}
+
+function startDaily(date) {
+  if (readOnly || !db || !sample) return;
+  const last = days[date]?.attempts?.at(-1);
+  dq = { date, status: last && !last.done ? 'answer' : 'generating', error: '', ctl: null, draft: '', review: null };
+  $('#dqDlg').showModal();
+  if (dq.status === 'generating') genDaily(); else renderDaily();
+}
+
+async function genDaily() {
+  const token = dq, date = dq.date;
+  const s = dayStatus(date), scope = quizScope(date);
+  const ctl = new AbortController();
+  Object.assign(dq, { status: 'generating', error: '', ctl, review: null });
+  renderDaily();
+  const list = scope.map((x, i) => `C${i}: ${x.g.name} / ${x.c.name}`).join('\n') || '（暂无章节，就按任务内容出题）';
+  const tasks = s.tasks.map(t => `- ${t.text}${t.done ? '（已完成）' : ''}`).join('\n') || '（今天没有写任务）';
+  const existing = scope.flatMap(x => x.c.questions.map(q => '- ' + q.q.replace(/\n/g, ' '))).slice(0, 60).join('\n') || '（暂无）';
+  try {
+    const r = await sample.json(
+`你是一位严格但友善的出题老师。学习者背景：10 年 Java 后端工程师，正在转型大模型后训练 / RL 系统方向，同时在读 AI 在职硕士。
+
+这是学习者今天的每日测验，用来检验他今天是否真的掌握了所学内容。
+
+今天的学习任务：
+${tasks}
+
+可出题的章节（每道题用编号标出它属于哪一章）：
+${list}
+
+题库里已有的题（不要重复，也不要换个说法重复）：
+${existing}
+
+请出 ${settings.quizCount} 道新题，围绕今天的任务内容。
+要求：
+- 简答题，1 到 3 分钟内能用几句话、一个式子或一个形状答出。
+- 优先考“结果的形状 / 数值是多少 / 每个位置从哪来 / 为什么”，少考纯名词记忆。
+- 不要出需要写完整代码的题；需要时可以在题目里给出几行代码让学习者推结果。
+- 参考答案简洁准确，1 到 3 句。拿不准的知识点不要出。
+- 用中文，代码和张量写法保持原样。
+
+只回复一个 JSON 数组：[{"q": "题目", "a": "参考答案", "ref": "C0"}, ...]`,
+      { signal: ctl.signal, cache: false });
+    if (dq !== token) return;
+    const items = (Array.isArray(r) ? r : []).filter(x => x && typeof x.q === 'string' && typeof x.a === 'string' && x.q.trim())
+      .slice(0, settings.quizCount)
+      .map(x => {
+        const sc = scope[parseInt(String(x.ref ?? '').replace(/\D/g, ''), 10)] || scope[0];
+        return { q: x.q.trim(), a: x.a.trim(), gameId: sc?.g.id || null, chapterId: sc?.c.id || null, answer: '', verdict: null, feedback: '' };
+      });
+    if (!items.length) throw { code: 'invalid_json' };
+    const d = ensureDay(date);
+    d.attempts.push({ id: uid(), at: new Date().toTimeString().slice(0, 5), items, done: false, right: 0, passed: false });
+    saveDay(d);
+    Object.assign(dq, { status: 'answer', ctl: null });
+  } catch (e) {
+    if (dq !== token) return;
+    if (e?.code === 'cancelled') return closeDaily();
+    Object.assign(dq, { status: 'error', error: sampleErr(e), ctl: null });
+    hideSampleIfDenied(e);
+  }
+  renderDaily();
+}
+
+function finishAttempt(d, a) {
+  const was = dayStatus(d.date).passed;
+  a.done = true;
+  a.right = a.items.filter(x => x.verdict === 'right').length;
+  a.passed = a.right >= Math.ceil(settings.quizPass / settings.quizCount * a.items.length);
+  const touched = new Set();
+  for (const it of a.items) {
+    if (it.verdict === 'right') continue;
+    const g = game(it.gameId), c = chapter(g, it.chapterId);
+    if (!c) continue;
+    c.questions.push({ id: uid(), q: it.q, a: it.a, by: 'claude', right: 0, wrong: 1 });
+    touched.add(g);
+  }
+  touched.forEach(saveGame);
+  saveDay(d);
+  if (a.passed) toast('📅', '每日测验通过', `${a.right} / ${a.items.length}`);
+  celebrate(d.date, was);
+}
+
+function renderDaily() {
+  if (!dq) return;
+  const body = $('#dqBody');
+  const head = `<div class="qhead"><span>📅 每日测验 · ${esc(dq.date)}</span>`;
+  if (dq.status === 'generating') {
+    body.innerHTML = `${head}</div><p>Claude 正在根据今天的任务出 ${settings.quizCount} 道题，通常要十几秒到一分钟…</p>
+      <div class="row"><button class="link" data-d="close">取消</button></div>`;
+    return;
+  }
+  const a = curAttempt();
+  if (dq.status === 'error' && (!a || a.done)) {
+    body.innerHTML = `${head}</div><p class="err">${esc(dq.error)}</p>
+      <div class="row"><button class="link" data-d="close">关闭</button><button class="ai" data-d="regen">再试一次</button></div>`;
+    return;
+  }
+  if (!a) return closeDaily();
+  const dots = a.items.map((it, i) => `<i class="${it.verdict === 'right' ? 'r' : it.verdict ? 'w' : i === (dq.review ?? a.items.findIndex(x => !x.verdict)) ? 'c' : ''}"></i>`).join('');
+  const nextIdx = a.items.findIndex(x => !x.verdict);
+
+  if (dq.review == null && (nextIdx < 0 || a.done)) {
+    const wrong = a.items.length - a.right;
+    body.innerHTML = `${head}</div><div class="qdots">${dots}</div>
+      <div class="result"><div class="big">${a.passed ? '📅' : '💀'}</div>
+        <h3>${a.passed ? '每日测验通过' : '这次没过'}</h3>
+        <p>Claude 判对 ${a.right} / ${a.items.length} 题${a.passed ? '' : `，需要 ${Math.ceil(settings.quizPass / settings.quizCount * a.items.length)} 题`}。${wrong ? `答错的 ${wrong} 题已收进题库。` : ''}</p></div>
+      <div class="row"><button class="${a.passed ? 'ok' : 'link'}" data-d="close">${a.passed ? '好的' : '先去复习'}</button>${a.passed ? '' : '<button class="ai" data-d="retry">重考（换一批新题）</button>'}</div>`;
+    return;
+  }
+
+  const i = dq.review ?? nextIdx;
+  const it = a.items[i];
+  const g = game(it.gameId), c = chapter(g, it.chapterId);
+  const reviewing = dq.review != null;
+  const verdictText = { right: '判对', partial: '部分正确（不算对）', wrong: '判错' };
+  body.innerHTML = `${head}<span>${i + 1} / ${a.items.length}</span></div>
+    <div class="qdots">${dots}</div>
+    <div class="qtext">${esc(it.q)}</div>
+    <div class="qsrc">${c ? `出自：${esc(g.name)} / ${esc(c.name)}` : '出自：今天的任务'}</div>
+    <label for="dqDraft" style="margin-top:14px">写下你的答案，提交后由 Claude 批改</label>
+    <textarea id="dqDraft" rows="4" ${reviewing || dq.status === 'grading' ? 'readonly' : ''}>${esc(reviewing ? it.answer : dq.draft)}</textarea>
+    ${dq.status === 'grading' ? '<div class="qai"><b>Claude 批改</b>Claude 思考中… <button class="link" data-d="stop">停止</button></div>' : ''}
+    ${dq.error && dq.status !== 'grading' ? `<p class="err">${esc(dq.error)}</p>` : ''}
+    ${reviewing ? `<div class="qai"><b>Claude 批改 · <span class="verdict ${it.verdict}">${verdictText[it.verdict]}</span></b>${esc(it.feedback)}</div>
+      <div class="qans"><b>参考答案</b>${esc(it.a)}</div>` : ''}
+    <div class="row">
+      <button class="link" data-d="close" style="margin-right:auto">稍后继续</button>
+      ${reviewing
+        ? `<button class="ok" data-d="next">${a.items.every(x => x.verdict) ? '看结果' : '下一题'}</button>`
+        : `<button class="ai" data-d="grade" ${dq.status === 'grading' ? 'disabled' : ''}>提交给 Claude 批改</button>`}
+    </div>`;
+  if (!reviewing && dq.status !== 'grading') setTimeout(() => $('#dqDraft')?.focus(), 0);
+}
+
+async function gradeDaily() {
+  const a = curAttempt();
+  const i = a.items.findIndex(x => !x.verdict);
+  const it = a.items[i];
+  const answer = $('#dqDraft').value.trim();
+  dq.draft = $('#dqDraft').value;
+  if (!answer) { dq.error = '先写下你的答案，再提交批改。'; renderDaily(); return; }
+  const ctl = new AbortController(), token = dq;
+  Object.assign(dq, { status: 'grading', error: '', ctl });
+  renderDaily();
+  try {
+    const g = game(it.gameId), c = chapter(g, it.chapterId);
+    const r = await claudeGrade({ subject: g?.name || '今天的任务', chapter: c?.name || '—', q: it.q, a: it.a, answer, signal: ctl.signal });
+    if (dq !== token) return;
+    if (!r.verdict) throw { code: 'invalid_json' };
+    const d = days[dq.date], cur = d.attempts[d.attempts.length - 1];
+    Object.assign(cur.items[i], { answer, verdict: r.verdict, feedback: r.feedback });
+    if (cur.items.every(x => x.verdict)) finishAttempt(d, cur); else saveDay(d);
+    Object.assign(dq, { review: i, draft: '' });
+  } catch (e) {
+    if (dq !== token) return;
+    dq.error = e?.code === 'cancelled' ? '' : sampleErr(e);
+    hideSampleIfDenied(e);
+  }
+  Object.assign(dq, { status: 'answer', ctl: null });
+  renderDaily();
+}
+
+function closeDaily() { dq?.ctl?.abort(); dq = null; if ($('#dqDlg').open) $('#dqDlg').close(); render(); }
+
+$('#dqBody').addEventListener('click', e => {
+  const act = e.target.closest('[data-d]')?.dataset.d; if (!act || !dq) return;
+  if (act === 'grade') return gradeDaily();
+  if (act === 'stop') return dq.ctl?.abort();
+  if (act === 'next') { dq.review = null; dq.error = ''; return renderDaily(); }
+  if (act === 'retry' || act === 'regen') return genDaily();
+  if (act === 'close') return closeDaily();
+});
+$('#dqDlg').addEventListener('cancel', e => { e.preventDefault(); closeDaily(); });
+
+// ---------- Claude 建议任务 ----------
+let ts = null; // {date, status, items, error, ctl}
+
+function openSuggest(date) {
+  ts = { date, status: 'idle', items: [], error: '', ctl: null };
+  $('#tsDlg').showModal();
+  runSuggest();
+}
+
+function renderSuggest() {
+  if (!ts) return;
+  const refName = it => { const g = game(it.gameId), c = chapter(g, it.chapterId); return c ? `${g.name} / ${c.name}` : ''; };
+  $('#tsBody').innerHTML = `
+    <h2>✨ Claude 建议任务</h2>
+    <p class="note">${esc(ts.date)} · 目标 ${fmtH(dayStatus(ts.date).target)} 小时。Claude 参考各科章节进度、最近的练习和错题来建议。</p>
+    ${ts.status === 'loading' ? '<p class="note">Claude 思考中，通常要十几秒到一分钟… <button class="link" data-s="stop">停止</button></p>' : ''}
+    ${ts.status === 'error' ? `<p class="err">${esc(ts.error)}</p>` : ''}
+    ${ts.items.map((x, i) => `
+      <label class="cand" for="ts_${i}" style="margin:0 0 6px"><input type="checkbox" id="ts_${i}" data-i="${i}" ${x.pick ? 'checked' : ''}>
+        <span><div class="q">${esc(x.text)}</div>${refName(x) ? `<div class="a">${esc(refName(x))}</div>` : ''}</span></label>`).join('')}
+    <div class="row">
+      <button class="link" data-s="close" style="margin-right:auto">关闭</button>
+      <button class="ai" data-s="run" ${ts.status === 'loading' ? 'disabled' : ''}>${ts.items.length ? '换一批' : '再试一次'}</button>
+      ${ts.items.length ? `<button class="ok" data-s="add" ${ts.items.some(x => x.pick) ? '' : 'disabled'}>加入当天任务</button>` : ''}
+    </div>`;
+}
+
+async function runSuggest() {
+  const token = ts, date = ts.date;
+  const ctl = new AbortController();
+  Object.assign(ts, { status: 'loading', error: '', ctl });
+  renderSuggest();
+  const { refs, progress } = chapterProgress();
+  const recent = games.flatMap(g => g.dlcs.filter(d => d.date >= addDays(date, -7)).map(d => `- ${d.date} ${g.name} · ${d.name} · ${d.minutes} 分钟`)).join('\n') || '（最近 7 天没有练习记录）';
+  const existing = dayStatus(date).tasks.map(t => '- ' + t.text).join('\n') || '（暂无）';
+  try {
+    const r = await sample.json(
+`你在帮一位在职学习者安排 ${date}（周${WEEK[weekday(date)]}）的学习任务。学习者背景：10 年 Java 后端工程师，转型大模型后训练 / RL 系统方向，在读 AI 在职硕士。当天目标学习 ${fmtH(dayStatus(date).target)} 小时。
+
+各科章节进度（编号用于标注任务属于哪一章）：
+${progress}
+
+最近 7 天的练习：
+${recent}
+
+当天已经写好的任务（不要重复）：
+${existing}
+
+请建议 3 到 5 条具体任务，加起来大约填满当天目标时长。
+要求：
+- 每条都要具体、可勾选完成，例如“做完第 4 章练习 4.1、4.2，并用小例子手算验证”，不要写“学习第 4 章”这种空话。
+- 按进度推进：优先当前未完成的章节，可以安排一条复习答错多的题。
+- 每条估一个分钟数。
+- 用中文。
+
+只回复一个 JSON 数组：[{"text": "任务内容", "minutes": 60, "ref": "C3"}]，ref 不属于任何章节时写 null。`,
+      { signal: ctl.signal, cache: false });
+    if (ts !== token) return;
+    const items = (Array.isArray(r) ? r : []).filter(x => x && typeof x.text === 'string' && x.text.trim()).slice(0, 6).map(x => {
+      const ref = x.ref == null ? null : refs[parseInt(String(x.ref).replace(/\D/g, ''), 10)];
+      const mins = Math.round(+x.minutes);
+      return { text: x.text.trim() + (mins > 0 ? `（约 ${mins} 分钟）` : ''), gameId: ref?.g.id || null, chapterId: ref?.c.id || null, pick: true };
+    });
+    Object.assign(ts, { status: items.length ? 'idle' : 'error', error: items.length ? '' : 'Claude 没给出可用的任务，再试一次。', items, ctl: null });
+  } catch (e) {
+    if (ts !== token) return;
+    Object.assign(ts, { status: e?.code === 'cancelled' ? 'idle' : 'error', error: sampleErr(e), ctl: null });
+    hideSampleIfDenied(e);
+  }
+  if (ts === token) renderSuggest();
+}
+
+$('#tsBody').addEventListener('click', e => {
+  const act = e.target.closest('[data-s]')?.dataset.s; if (!act || !ts) return;
+  if (act === 'run') return runSuggest();
+  if (act === 'stop') return ts.ctl?.abort();
+  if (act === 'close') { ts.ctl?.abort(); ts = null; $('#tsDlg').close(); return; }
+  if (act === 'add') {
+    const d = ensureDay(ts.date);
+    const was = dayStatus(ts.date).passed;
+    for (const x of ts.items.filter(x => x.pick)) d.tasks.push({ id: uid(), text: x.text, gameId: x.gameId, chapterId: x.chapterId, done: false });
+    saveDay(d); celebrate(ts.date, was);
+    ts = null; $('#tsDlg').close(); render();
+  }
+});
+$('#tsBody').addEventListener('change', e => {
+  if (e.target.dataset.i != null && ts) { ts.items[+e.target.dataset.i].pick = e.target.checked; renderSuggest(); }
+});
+$('#tsDlg').addEventListener('cancel', e => { e.preventDefault(); ts?.ctl?.abort(); ts = null; $('#tsDlg').close(); });
+
+
+// ---------- 周计划：复盘这周，排下周 ----------
+// 一次排一周（周一到周六）。没勾完的任务优先补；落后就放慢，超前就推进。复盘说明存在 weeks/<下周一>。
+let weeks = {};
+const mondayOf = date => addDays(date, -((weekday(date) + 6) % 7));
+const weekDates = monday => Array.from({ length: 7 }, (_, i) => addDays(monday, i));
+let wp = null; // {from, to, status, hint, review, days: [{date, tasks: [{text, gameId, chapterId, pick}]}], error, ctl}
+
+function chapterProgress() {
+  const refs = games.flatMap(g => g.chapters.map(c => ({ g, c })));
+  const progress = games.map(g => {
+    const chs = g.chapters.map(c => `  C${refs.findIndex(r => r.c === c)}: ${c.name}（${c.done ? '已完成' : '未完成'}，题库 ${c.questions.length} 题，答错多的 ${c.questions.filter(q => q.wrong > q.right).length} 题）`).join('\n');
+    return `${g.name}：\n${chs || '  （还没有章节）'}`;
+  }).join('\n');
+  return { refs, progress };
+}
+
+function weekSummary(monday) {
+  return weekDates(monday).map(date => {
+    const s = dayStatus(date);
+    const head = `${date}（周${WEEK[weekday(date)]}）`;
+    if (s.rest) return `${head}：主日`;
+    const at = (days[date]?.attempts || []).filter(a => a.done);
+    const best = at.reduce((b, a) => Math.max(b, a.right), 0);
+    const tasks = s.tasks.map(t => {
+      const g = game(t.gameId), c = chapter(g, t.chapterId);
+      return `    [${t.done ? '✓' : ' '}] ${t.text}${c ? `（${g.name} / ${c.name}）` : ''}`;
+    }).join('\n') || '    （没有任务）';
+    return `${head}${date > today() ? '【还没到】' : ''}：时长 ${fmtH(s.minutes)}/${fmtH(s.target)}h；测验${at.length ? `考了 ${at.length} 次，最好 ${best}/${settings.quizCount}，${s.quizOk ? '通过' : '未通过'}` : '没考'}；${s.passed ? '通关' : '未通关'}\n${tasks}`;
+  }).join('\n');
+}
+
+function openPlan(date) {
+  const from = mondayOf(date);
+  wp = { from, to: addDays(from, 7), status: 'idle', hint: '', review: '', days: [], error: '', ctl: null };
+  renderPlan();
+  $('#wpDlg').showModal();
+}
+
+function renderPlan() {
+  if (!wp) return;
+  const md = d => `${+d.slice(5, 7)} 月 ${+d.slice(8)} 日`;
+  const refName = t => { const g = game(t.gameId), c = chapter(g, t.chapterId); return c ? `${g.name} / ${c.name}` : ''; };
+  const picked = wp.days.reduce((a, d) => a + d.tasks.filter(t => t.pick).length, 0);
+  $('#wpBody').innerHTML = `
+    <h2>✨ 复盘这周，排下周</h2>
+    <p class="note">复盘 ${md(wp.from)} 这一周的完成情况，排 ${md(wp.to)} 起的周一到周六。周日是主日，不排任务。</p>
+    <label for="wpHint">补充说明（可空）</label>
+    <input id="wpHint" maxlength="300" value="${esc(wp.hint)}" placeholder="例如：周三要加班，只能学 1 小时；第 4 章还是没吃透" ${wp.status === 'loading' ? 'readonly' : ''}>
+    ${wp.status === 'loading' ? '<p class="note">Claude 正在复盘并排计划，通常要半分钟到一两分钟… <button class="link" data-w="stop">停止</button></p>' : ''}
+    ${wp.status === 'error' ? `<p class="err">${esc(wp.error)}</p>` : ''}
+    ${wp.review ? `<div class="qai"><b>本周复盘</b>${esc(wp.review)}</div>` : ''}
+    ${wp.days.map((d, di) => `
+      <h3 class="wpday">${md(d.date)} · 周${WEEK[weekday(d.date)]}<span class="note">${fmtH(d.tasks.filter(t => t.pick).reduce((a, t) => a + (t.minutes || 0), 0))} h</span></h3>
+      ${d.tasks.map((t, ti) => `
+        <label class="cand" for="wp_${di}_${ti}" style="margin:0 0 6px"><input type="checkbox" id="wp_${di}_${ti}" data-di="${di}" data-ti="${ti}" ${t.pick ? 'checked' : ''}>
+          <span><div class="q">${esc(t.text)}</div>${refName(t) ? `<div class="a">${esc(refName(t))}</div>` : ''}</span></label>`).join('') || '<p class="note">这天没有安排。</p>'}`).join('')}
+    <div class="row">
+      <button class="link" data-w="close" style="margin-right:auto">关闭</button>
+      <button class="ai" data-w="run" ${wp.status === 'loading' ? 'disabled' : ''}>${wp.days.length ? '重新排' : '开始复盘'}</button>
+      ${wp.days.length ? `<button class="ok" data-w="save" ${picked ? '' : 'disabled'}>写入日历（${picked} 条）</button>` : ''}
+    </div>`;
+}
+
+async function runPlan() {
+  const token = wp;
+  wp.hint = $('#wpHint').value.trim();
+  const ctl = new AbortController();
+  Object.assign(wp, { status: 'loading', error: '', ctl });
+  renderPlan();
+  const { refs, progress } = chapterProgress();
+  const dates = weekDates(wp.to).filter(d => !isRest(d));
+  const existing = dates.flatMap(d => (days[d]?.tasks || []).map(t => `- ${d}：${t.text}`)).join('\n') || '（暂无）';
+  try {
+    const r = await sample.json(
+`你是学习者的学习教练，按“打游戏做任务”的方式排周计划：每天是一个关卡，任务要具体、可勾选，完成情况决定下周怎么调。
+学习者背景：10 年 Java 后端工程师，在职转型大模型后训练 / RL 系统方向，在读 AI 在职硕士。周一到周六每天目标 ${fmtH(settings.dailyTargetMin)} 小时；周日是主日，要敬拜，绝不安排学习。
+
+这一周（${wp.from} 起）的完成情况（[✓] 已完成，[ ] 没完成）：
+${weekSummary(wp.from)}
+
+各科章节进度（编号用于标注任务属于哪一章）：
+${progress}
+
+下周已经写好的任务（不要重复）：
+${existing}
+${wp.hint ? '\n学习者补充：' + wp.hint + '\n' : ''}
+请先写一段复盘（3 到 5 句：完成了什么、没完成什么、可能的原因、下周节奏怎么调），再排下周每天的任务。
+规则：
+- 这周没勾完的任务优先安排，必要时拆小。
+- 这周时长或任务明显没完成时，下周要放慢，不要把欠下的全部堆上去；完成得好就往前推进。
+- 每天任务加起来约等于当天目标时长，每条估一个分钟数。
+- 每条具体到小节或练习编号，例如“做完第 4 章练习 4.1、4.2，并用小例子手算验证”，不要写“学习第 4 章”这种空话。
+- 测验没通过或答错多的章节，安排复习或 Boss 战。
+- 只排这些日期：${dates.join('、')}
+- 用中文。
+
+只回复一个 JSON 对象：{"review": "复盘", "days": [{"date": "YYYY-MM-DD", "tasks": [{"text": "任务", "minutes": 60, "ref": "C3"}]}]}，ref 不属于任何章节时写 null。`,
+      { signal: ctl.signal, cache: false });
+    if (wp !== token) return;
+    const planDays = dates.map(date => {
+      const src = (Array.isArray(r?.days) ? r.days : []).find(d => d?.date === date);
+      const tasks = (Array.isArray(src?.tasks) ? src.tasks : []).filter(t => t && typeof t.text === 'string' && t.text.trim()).slice(0, 8).map(t => {
+        const ref = t.ref == null ? null : refs[parseInt(String(t.ref).replace(/\D/g, ''), 10)];
+        const minutes = Math.max(0, Math.round(+t.minutes) || 0);
+        return { text: t.text.trim() + (minutes ? `（约 ${minutes} 分钟）` : ''), minutes, gameId: ref?.g.id || null, chapterId: ref?.c.id || null, pick: true };
+      });
+      return { date, tasks };
+    });
+    const ok = planDays.some(d => d.tasks.length);
+    Object.assign(wp, { status: ok ? 'idle' : 'error', error: ok ? '' : 'Claude 没排出可用的计划，再试一次。', review: String(r?.review || ''), days: ok ? planDays : [], ctl: null });
+  } catch (e) {
+    if (wp !== token) return;
+    Object.assign(wp, { status: e?.code === 'cancelled' ? 'idle' : 'error', error: sampleErr(e), ctl: null });
+    hideSampleIfDenied(e);
+  }
+  if (wp === token) renderPlan();
+}
+
+$('#wpBody').addEventListener('click', e => {
+  const act = e.target.closest('[data-w]')?.dataset.w; if (!act || !wp) return;
+  if (act === 'run') return runPlan();
+  if (act === 'stop') return wp.ctl?.abort();
+  if (act === 'close') { wp.ctl?.abort(); wp = null; $('#wpDlg').close(); return; }
+  if (act === 'save') {
+    if (readOnly || !db) return;
+    for (const d of wp.days) {
+      const picked = d.tasks.filter(t => t.pick);
+      if (!picked.length) continue;
+      const day = ensureDay(d.date);
+      for (const t of picked) day.tasks.push({ id: uid(), text: t.text, gameId: t.gameId, chapterId: t.chapterId, done: false });
+      saveDay(day);
+    }
+    if (wp.review) {
+      const doc = { review: wp.review, from: wp.from, createdAt: today() };
+      weeks[wp.to] = doc;
+      put('weeks/' + wp.to, () => clone(doc));
+    }
+    toast('🗓', '下周计划已写入日历', `${wp.to} 起`);
+    calSel = wp.to; calMonth = wp.to.slice(0, 7);
+    wp = null; $('#wpDlg').close(); render();
+  }
+});
+$('#wpBody').addEventListener('change', e => {
+  if (e.target.dataset.di == null || !wp) return;
+  wp.days[+e.target.dataset.di].tasks[+e.target.dataset.ti].pick = e.target.checked;
+  renderPlan();
+});
+$('#wpDlg').addEventListener('cancel', e => { e.preventDefault(); wp?.ctl?.abort(); wp = null; $('#wpDlg').close(); });
+
+document.querySelector('nav').addEventListener('click', e => { const v = e.target.closest('[data-view]')?.dataset.view; if (v) setView(v); });
 
 // ---------- boot ----------
 render();
@@ -824,6 +1502,14 @@ render();
     loaded.games = true;
     render();
   }, e => showBanner('云端存档连接中断（' + e.code + '），刷新页面重试。'));
+  db.collection('days').onSnapshot(snap => {
+    days = Object.fromEntries(snap.docs.map(d => [d.id, { tasks: [], attempts: [], ...clone(d.data()), date: d.id }]));
+    render();
+  }, e => showBanner('日历存档连接中断（' + e.code + '），刷新页面重试。'));
+  db.collection('weeks').onSnapshot(snap => {
+    weeks = Object.fromEntries(snap.docs.map(d => [d.id, clone(d.data())]));
+    render();
+  }, () => {});
   db.doc('meta/settings').onSnapshot(snap => {
     settings = snap.exists ? { ...clone(DEFAULT_SETTINGS), ...clone(snap.data()) } : clone(DEFAULT_SETTINGS);
     loaded.settings = true;
