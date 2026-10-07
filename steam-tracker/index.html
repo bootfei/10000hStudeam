@@ -1,4 +1,4 @@
-<title>学习时长库</title>
+<title>ai-studeam</title>
 <style>
   /* 布局：Steam 客户端式 —— 顶栏 + 目标条 + 左侧游戏库 + 右侧游戏详情。单一深色世界，刻意不做浅色主题。 */
   :root {
@@ -247,9 +247,9 @@ const HOUR_ACHIEVEMENTS = [
   [1000, '👑', '千锤百炼', '累计 1000 小时'],
 ];
 const WARMUP_SIZE = 3;
-const DEFAULT_SETTINGS = { start: '2026-11-01', running: null, dailyTargetMin: 240, restDays: [0], quizCount: 5, quizPass: 4, goals: [
-  { name: '2 年 · 硕士期间', hours: 2500, years: 2 },
-  { name: '5 年 · 终极目标', hours: 10000, years: 5 },
+const DEFAULT_SETTINGS = { start: '2026-11-01', running: null, dailyTargetMin: 60, weekdayTargetMin: { 6: 300 }, restDays: [0], quizCount: 3, quizPass: 2, goals: [
+  { name: '硕士期间', hours: 1000, years: 2 },
+  { name: '终极目标', hours: 10000, years: 7 },
 ]};
 
 // ---------- state（云端为准，本地只是镜像） ----------
@@ -356,7 +356,7 @@ function render() {
         ? `${esc(settings.start)} 开始计算`
         : `按计划应到 ${expected.toFixed(1)}h，${diff >= 0 ? `<span style="color:var(--green1)">领先 ${diff.toFixed(1)}h</span>` : `<span style="color:var(--red)">落后 ${(-diff).toFixed(1)}h</span>`}`;
       return `<div class="bar">
-        <div class="stat" style="display:flex;justify-content:space-between;gap:8px"><span>${esc(goal.name)} · ${goal.hours.toLocaleString()}h（每周 ${perWeek.toFixed(1)}h）</span><span>${pct.toFixed(2)}%</span></div>
+        <div class="stat" style="display:flex;justify-content:space-between;gap:8px"><span>${goal.years} 年 · ${esc(goal.name)} · ${goal.hours.toLocaleString()}h（每周 ${perWeek.toFixed(1)}h）</span><span>${pct.toFixed(2)}%</span></div>
         <div class="track"><div class="fill" style="width:${pct}%"></div></div>
         <div class="stat" style="margin-top:4px">${status}</div>
       </div>`;
@@ -831,11 +831,18 @@ $('#goalBtn').onclick = async () => {
   if (readOnly || !db) return;
   const r = await ask({ title: '设置目标', ok: '保存', fields: [
     { name: 'start', label: '计划起始日期', type: 'date', required: true, value: settings.start },
-    ...settings.goals.map((g, i) => ({ name: 'h' + i, label: `「${g.name}」目标小时数（${g.years} 年）`, type: 'number', min: 1, required: true, value: g.hours })),
+    { name: 'daily', label: '周一到周五每天目标（分钟）', type: 'number', min: 0, required: true, value: settings.dailyTargetMin },
+    { name: 'sat', label: '周六目标（分钟）', type: 'number', min: 0, required: true, value: settings.weekdayTargetMin?.[6] ?? settings.dailyTargetMin },
+    ...settings.goals.flatMap((g, i) => [
+      { name: 'h' + i, label: `「${g.name}」目标小时数`, type: 'number', min: 1, required: true, value: g.hours },
+      { name: 'y' + i, label: `「${g.name}」年限`, type: 'number', min: 1, required: true, value: g.years },
+    ]),
   ]});
   if (!r) return;
   settings.start = r.start;
-  settings.goals = settings.goals.map((g, i) => ({ ...g, hours: Math.max(1, Math.round(+r['h' + i]) || g.hours) }));
+  settings.dailyTargetMin = Math.max(0, Math.round(+r.daily) || 0);
+  settings.weekdayTargetMin = { ...(settings.weekdayTargetMin || {}), 6: Math.max(0, Math.round(+r.sat) || 0) };
+  settings.goals = settings.goals.map((g, i) => ({ ...g, hours: Math.max(1, Math.round(+r['h' + i]) || g.hours), years: Math.max(1, Math.round(+r['y' + i]) || g.years) }));
   saveSettings(); render();
 };
 
@@ -860,7 +867,7 @@ $('#importFile').onchange = async e => {
   }
   for (const raw of Array.isArray(s.days) ? s.days : []) {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(raw?.date || '')) continue;
-    saveDay({ date: raw.date, targetMin: raw.targetMin ?? settings.dailyTargetMin, tasks: raw.tasks || [], attempts: raw.attempts || [] });
+    saveDay({ date: raw.date, targetMin: raw.targetMin ?? targetFor(raw.date), tasks: raw.tasks || [], attempts: raw.attempts || [] });
   }
   const st = s.settings || (s.goals ? { start: s.start, goals: s.goals } : null);
   if (st?.goals) { settings = { ...settings, start: st.start || settings.start, goals: st.goals }; saveSettings(); }
@@ -876,13 +883,17 @@ const weekday = date => new Date(date + 'T00:00:00').getDay();
 const isRest = date => (settings.restDays || []).includes(weekday(date));
 const addDays = (date, n) => { const d = new Date(date + 'T00:00:00'); d.setDate(d.getDate() + n); return new Date(d - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 10); };
 const dayMins = date => games.reduce((a, g) => a + g.dlcs.filter(d => d.date === date).reduce((s, d) => s + d.minutes, 0), 0);
-const ensureDay = date => days[date] || { date, targetMin: settings.dailyTargetMin, tasks: [], attempts: [] };
+// 当天目标：主日为 0；按星期几单独设置的优先，其余用每日默认值
+const targetFor = date => isRest(date) ? 0 : (settings.weekdayTargetMin?.[weekday(date)] ?? settings.dailyTargetMin);
+const targetDesc = () => [1, 2, 3, 4, 5, 6].filter(w => !(settings.restDays || []).includes(w))
+  .map(w => `周${WEEK[w]} ${fmtH(settings.weekdayTargetMin?.[w] ?? settings.dailyTargetMin)} 小时`).join('，');
+const ensureDay = date => days[date] || { date, targetMin: targetFor(date), tasks: [], attempts: [] };
 const saveDay = d => { days[d.date] = d; put('days/' + d.date, () => { const { date: _, ...body } = d; return clone(body); }); };
 
 function dayStatus(date) {
   const d = days[date];
   const rest = isRest(date);
-  const target = rest ? 0 : (d?.targetMin ?? settings.dailyTargetMin);
+  const target = rest ? 0 : (d?.targetMin ?? targetFor(date));
   const minutes = dayMins(date);
   const tasks = d?.tasks || [];
   const timeOk = minutes >= target;
@@ -1003,7 +1014,7 @@ function renderDayPanel(date) {
       </form>` : ''}
     </div>
     <div class="card"><h2>③ 每日测验 ${pill(s.quizOk)}</h2>
-      <div class="note">Claude 根据当天任务现场出 ${settings.quizCount} 道新题并逐题批改，判对 ${settings.quizPass} 道及以上算通过，“部分正确”不算对。没过可以重考，每次换一批新题。答错的题会收进对应章节的题库。</div>
+      <div class="note">先勾完任务再考：Claude 只针对已勾完的任务现场出 ${settings.quizCount} 道新题并逐题批改，判对 ${settings.quizPass} 道及以上算通过，“部分正确”不算对。没过可以重考，每次换一批新题。答错的题会收进对应章节的题库。</div>
       ${attempts.filter(a => a.done).map((a, i) => `<div class="split"><span>第 ${i + 1} 次 · ${esc(a.at)}</span><b style="color:${a.passed ? 'var(--green1)' : 'var(--red)'}">${a.right} / ${a.items.length} ${a.passed ? '通过' : '未通过'}</b></div>`).join('')}
       <div class="qbar">${isToday
         ? sample
@@ -1062,8 +1073,10 @@ let dq = null; // {date, status: 'generating'|'answer'|'grading'|'error', error,
 const curAttempt = () => { const a = days[dq?.date]?.attempts; return a?.[a.length - 1]; };
 
 function quizScope(date) {
-  const linked = dayStatus(date).tasks.map(t => { const g = game(t.gameId); return { g, c: chapter(g, t.chapterId) }; }).filter(x => x.c);
-  const scope = linked.length ? linked : games.flatMap(g => { const cur = g.chapters.find(c => !c.done); return cur ? [{ g, c: cur }] : []; });
+  const tasks = dayStatus(date).tasks;
+  const link = ts => ts.map(t => { const g = game(t.gameId); return { g, c: chapter(g, t.chapterId) }; }).filter(x => x.c);
+  const done = link(tasks.filter(t => t.done)), all = link(tasks);
+  const scope = done.length ? done : all.length ? all : games.flatMap(g => { const cur = g.chapters.find(c => !c.done); return cur ? [{ g, c: cur }] : []; });
   const seen = new Set();
   return scope.filter(x => !seen.has(x.c.id) && seen.add(x.c.id));
 }
@@ -1083,7 +1096,8 @@ async function genDaily() {
   Object.assign(dq, { status: 'generating', error: '', ctl, review: null });
   renderDaily();
   const list = scope.map((x, i) => `C${i}: ${x.g.name} / ${x.c.name}`).join('\n') || '（暂无章节，就按任务内容出题）';
-  const tasks = s.tasks.map(t => `- ${t.text}${t.done ? '（已完成）' : ''}`).join('\n') || '（今天没有写任务）';
+  const doneTasks = s.tasks.filter(t => t.done).map(t => '- ' + t.text).join('\n');
+  const todoTasks = s.tasks.filter(t => !t.done).map(t => '- ' + t.text).join('\n');
   const existing = scope.flatMap(x => x.c.questions.map(q => '- ' + q.q.replace(/\n/g, ' '))).slice(0, 60).join('\n') || '（暂无）';
   try {
     const r = await sample.json(
@@ -1091,8 +1105,11 @@ async function genDaily() {
 
 这是学习者今天的每日测验，用来检验他今天是否真的掌握了所学内容。
 
-今天的学习任务：
-${tasks}
+今天已经完成的任务（只考这些内容）：
+${doneTasks || '（还没有勾选完成的任务）'}
+
+今天还没完成的任务（还没学，不要考）：
+${todoTasks || '（无）'}
 
 可出题的章节（每道题用编号标出它属于哪一章）：
 ${list}
@@ -1100,8 +1117,9 @@ ${list}
 题库里已有的题（不要重复，也不要换个说法重复）：
 ${existing}
 
-请出 ${settings.quizCount} 道新题，围绕今天的任务内容。
+请出 ${settings.quizCount} 道新题。
 要求：
+- 只考“已经完成的任务”里实际学到的小节；同一章里还没学到的小节一律不要考，不要超前。没有已完成任务时，只考这些章节最开头、最基础的内容。
 - 简答题，1 到 3 分钟内能用几句话、一个式子或一个形状答出。
 - 优先考“结果的形状 / 数值是多少 / 每个位置从哪来 / 为什么”，少考纯名词记忆。
 - 不要出需要写完整代码的题；需要时可以在题目里给出几行代码让学习者推结果。
@@ -1409,7 +1427,7 @@ async function runPlan() {
   try {
     const r = await sample.json(
 `你是学习者的学习教练，按“打游戏做任务”的方式排周计划：每天是一个关卡，任务要具体、可勾选，完成情况决定下周怎么调。
-学习者背景：10 年 Java 后端工程师，在职转型大模型后训练 / RL 系统方向，在读 AI 在职硕士。周一到周六每天目标 ${fmtH(settings.dailyTargetMin)} 小时；周日是主日，要敬拜，绝不安排学习。
+学习者背景：10 年 Java 后端工程师，在职转型大模型后训练 / RL 系统方向，在读 AI 在职硕士。每天的目标时长：${targetDesc()}；周日是主日，要敬拜，绝不安排学习。
 
 这一周（${wp.from} 起）的完成情况（[✓] 已完成，[ ] 没完成）：
 ${weekSummary(wp.from)}
