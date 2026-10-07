@@ -777,10 +777,14 @@ total += loss.item()   # ✓ 变成 Python float，脱离计算图
 
 ### 练习 6.1：标量
 
-$f(x, y) = x^2 y + y^3$，在 $x=2, y=3$ 处：
+```
+f(x, y) = x² · y + y³        在 x = 2, y = 3 处：
 
-- $\partial f/\partial x = 2xy = 12$
-- $\partial f/\partial y = x^2 + 3y^2 = 4 + 27 = 31$
+∂f/∂x = 2xy       = 2·2·3       = 12
+∂f/∂y = x² + 3y²  = 4 + 27      = 31
+```
+
+（`∂f/∂x` 读作"f 对 x 的偏导"：只让 x 变、y 当常数，f 变化的速率。）
 
 ```python
 x = torch.tensor(2.0, requires_grad=True)
@@ -792,15 +796,22 @@ print(x.grad, y.grad)      # 12.0 和 31.0
 
 ### 练习 6.2：矩阵乘法的梯度（逐元素推导）
 
-设 X 是 (3, 4)，W 是 (4, 5)，$L = \text{sum}(XW)$。
+设 X 是 (3, 4)，W 是 (4, 5)，`L = (X @ W).sum()`。
 
-**第一步：把 L 写成元素式子。** `(XW)[i][j] = Σ_k X[i][k] W[k][j]`，再对所有 i、j 求和：
+**第一步：把 L 写成元素式子。** `(XW)[i][j] = Σ_k X[i][k] · W[k][j]`，再对所有 i、j 求和：
 
-$$L = \sum_i \sum_j \sum_k X[i][k] \cdot W[k][j]$$
+```
+L = Σ_i Σ_j Σ_k  X[i][k] · W[k][j]
+
+（Σ_i 读作"让 i 跑遍所有取值，把后面的项全加起来"，
+  三个 Σ 就是三层嵌套 for 循环里的累加）
+```
 
 **第二步：对某一个 W[k][j] 求偏导。** 只有含 W[k][j] 的项留下（对每个 i 各有一项）：
 
-$$\frac{\partial L}{\partial W[k][j]} = \sum_i X[i][k] = \text{X 第 k 列之和}$$
+```
+∂L / ∂W[k][j]  =  Σ_i X[i][k]  =  X 第 k 列之和
+```
 
 结果和 j 无关：梯度矩阵的每一行 k 都是同一个数复制 5 次。
 
@@ -821,7 +832,13 @@ print(W.grad[:, 0], X.sum(dim=0))         # 两者应该相同
 
 ### 练习 6.3：数值梯度对拍
 
-导数定义：$f'(x) \approx \frac{f(x+\epsilon) - f(x-\epsilon)}{2\epsilon}$。把每个元素挨个推一点点，看 f 变多少：
+导数定义（ε 是一个很小的数，比如 0.0001）：
+
+```
+f'(x) ≈ ( f(x + ε) − f(x − ε) ) / (2ε)
+```
+
+把每个元素挨个推一点点，看 f 变多少：
 
 ```python
 def numeric_grad(f, x, eps=1e-4):
