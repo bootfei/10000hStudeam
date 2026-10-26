@@ -13,11 +13,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 命令
 
-学习练习：系统 Python 3.10 + torch 2.2，没有 venv / requirements。
+学习练习：项目内 `.venv`（Python 3.10 + torch 2.2，已在 `.gitignore`），还没有 requirements。用 `.venv` 里的解释器跑：
 
 ```bash
-python3 main03.py
+.venv/bin/python main03.py
 ```
+
+或者先 `source .venv/bin/activate` 再 `python main03.py`。
 
 steam-tracker 没有构建、没有测试框架。改完后检查脚本语法：
 
