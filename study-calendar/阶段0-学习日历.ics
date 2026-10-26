@@ -1,0 +1,546 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//ai-studeam//study-calendar//CN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:AI 学习
+X-WR-TIMEZONE:Asia/Shanghai
+BEGIN:VTIMEZONE
+TZID:Asia/Shanghai
+BEGIN:STANDARD
+DTSTART:19700101T000000
+TZOFFSETFROM:+0800
+TZOFFSETTO:+0800
+TZNAME:CST
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+UID:2026-10-26-0@ai-studeam.study-calendar
+DTSTAMP:20261026T053330Z
+DTSTART;TZID=Asia/Shanghai:20261026T210000
+DTEND;TZID=Asia/Shanghai:20261026T220000
+SUMMARY:阶段0 · 回温第 4 章
+DESCRIPTION:第 1 周 · 重启周（已排进 ai-studeam）\n本周目标
+ ：打完第 4 章 Boss，学完第 5 章并打 Boss。周六先排 3 小
+ 时，下周恢复 5 小时。\n\n今天 1 小时：\n· 回温：重读 
+ §4.1–4.3，用 arange(12) 重新手算 view / transpose / stride（30 
+ 分钟）\n· 第 4 章答错的 view / stride 题，先写答案再对答
+ 案（30 分钟）\n\n勾任务、计时、做测验：https://claude.ai/a
+ rtifact/DNdrzbZ41NYggPAc6wzkau
+URL:https://claude.ai/artifact/DNdrzbZ41NYggPAc6wzkau
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:回温第 4 章
+TRIGGER:-PT15M
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-10-27-0@ai-studeam.study-calendar
+DTSTAMP:20261026T053330Z
+DTSTART;TZID=Asia/Shanghai:20261027T210000
+DTEND;TZID=Asia/Shanghai:20261027T220000
+SUMMARY:阶段0 · §4.4 contiguous
+DESCRIPTION:第 1 周 · 重启周（已排进 ai-studeam）\n本周目标
+ ：打完第 4 章 Boss，学完第 5 章并打 Boss。周六先排 3 小
+ 时，下周恢复 5 小时。\n\n今天 1 小时：\n· §4.4：触发 vi
+ ew 报错，再用 contiguous() / reshape 修好（40 分钟）\n· 练习
+  4.2：用自己的话解释那条报错（20 分钟）\n\n勾任务、计
+ 时、做测验：https://claude.ai/artifact/DNdrzbZ41NYggPAc6wzkau
+URL:https://claude.ai/artifact/DNdrzbZ41NYggPAc6wzkau
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:§4.4 contiguous
+TRIGGER:-PT15M
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-10-28-0@ai-studeam.study-calendar
+DTSTAMP:20261026T053330Z
+DTSTART;TZID=Asia/Shanghai:20261028T210000
+DTEND;TZID=Asia/Shanghai:20261028T220000
+SUMMARY:阶段0 · §4.5 多头切分
+DESCRIPTION:第 1 周 · 重启周（已排进 ai-studeam）\n本周目标
+ ：打完第 4 章 Boss，学完第 5 章并打 Boss。周六先排 3 小
+ 时，下周恢复 5 小时。\n\n今天 1 小时：\n· §4.5：手算 vi
+ ew + transpose 后每个 token 的数去了哪里（40 分钟）\n· 练
+ 习 4.1：切过去再切回来，确认和原张量完全相等（20 分
+ 钟）\n\n勾任务、计时、做测验：https://claude.ai/artifact/DNdr
+ zbZ41NYggPAc6wzkau
+URL:https://claude.ai/artifact/DNdrzbZ41NYggPAc6wzkau
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:§4.5 多头切分
+TRIGGER:-PT15M
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-10-29-0@ai-studeam.study-calendar
+DTSTAMP:20261026T053330Z
+DTSTART;TZID=Asia/Shanghai:20261029T210000
+DTEND;TZID=Asia/Shanghai:20261029T220000
+SUMMARY:阶段0 · 第 4 章 Boss
+DESCRIPTION:第 1 周 · 重启周（已排进 ai-studeam）\n本周目标
+ ：打完第 4 章 Boss，学完第 5 章并打 Boss。周六先排 3 小
+ 时，下周恢复 5 小时。\n\n今天 1 小时：\n· 挑战第 4 章 B
+ oss，没过的题弄懂再打（30 分钟）\n· §5.1 梯度在数值上
+ 是什么（30 分钟）\n\n勾任务、计时、做测验：https://claud
+ e.ai/artifact/DNdrzbZ41NYggPAc6wzkau
+URL:https://claude.ai/artifact/DNdrzbZ41NYggPAc6wzkau
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:第 4 章 Boss
+TRIGGER:-PT15M
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-10-30-0@ai-studeam.study-calendar
+DTSTAMP:20261026T053330Z
+DTSTART;TZID=Asia/Shanghai:20261030T210000
+DTEND;TZID=Asia/Shanghai:20261030T220000
+SUMMARY:阶段0 · §5.2 计算图
+DESCRIPTION:第 1 周 · 重启周（已排进 ai-studeam）\n本周目标
+ ：打完第 4 章 Boss，学完第 5 章并打 Boss。周六先排 3 小
+ 时，下周恢复 5 小时。\n\n今天 1 小时：\n· §5.2 计算图
+ 与 .grad 累加：x**2 连续两次 backward（40 分钟）\n· 第 5 章
+ 答错的题，先写答案再对（20 分钟）\n\n勾任务、计时、
+ 做测验：https://claude.ai/artifact/DNdrzbZ41NYggPAc6wzkau
+URL:https://claude.ai/artifact/DNdrzbZ41NYggPAc6wzkau
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:§5.2 计算图
+TRIGGER:-PT15M
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-10-31-0@ai-studeam.study-calendar
+DTSTAMP:20261026T053330Z
+DTSTART;TZID=Asia/Shanghai:20261031T090000
+DTEND;TZID=Asia/Shanghai:20261031T120000
+SUMMARY:阶段0 · 第 5 章 Boss
+DESCRIPTION:第 1 周 · 重启周（已排进 ai-studeam）\n本周目标
+ ：打完第 4 章 Boss，学完第 5 章并打 Boss。周六先排 3 小
+ 时，下周恢复 5 小时。\n\n今天 3 小时：\n· §5.3 三个关
+ 掉磁带的场景（20 分钟）\n· §5.4 手动更新的陷阱：两种
+ 错误写法都跑一遍（50 分钟）\n· §5.5 loss 累加用 .item()
+ （20 分钟）\n· 挑战第 5 章 Boss（30 分钟）\n· 练习 6.1：
+ 纸上手算梯度，再用 autograd 对拍（40 分钟）\n· 复习本
+ 周错题（20 分钟）\n\n勾任务、计时、做测验：https://claud
+ e.ai/artifact/DNdrzbZ41NYggPAc6wzkau
+URL:https://claude.ai/artifact/DNdrzbZ41NYggPAc6wzkau
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:第 5 章 Boss
+TRIGGER:-PT15M
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-11-02-0@ai-studeam.study-calendar
+DTSTAMP:20261026T053330Z
+DTSTART;TZID=Asia/Shanghai:20261102T210000
+DTEND;TZID=Asia/Shanghai:20261102T220000
+SUMMARY:阶段0 · 练习 6.2 前半
+DESCRIPTION:第 2 周 · 手算梯度（草稿，周六复盘后在 ai-stud
+ eam 里重排）\n本周目标：学完第 6 章并打 Boss，第 7 章写
+ 出第一版训练循环。\n\n今天 1 小时：\n· 练习 6.2：用 2×
+ 2 小例子逐项展开，逐元素写出 dW（60 分钟）\n\n勾任务
+ 、计时、做测验：https://claude.ai/artifact/DNdrzbZ41NYggPAc6wzkau
+URL:https://claude.ai/artifact/DNdrzbZ41NYggPAc6wzkau
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:练习 6.2 前半
+TRIGGER:-PT15M
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-11-03-0@ai-studeam.study-calendar
+DTSTAMP:20261026T053330Z
+DTSTART;TZID=Asia/Shanghai:20261103T210000
+DTEND;TZID=Asia/Shanghai:20261103T220000
+SUMMARY:阶段0 · 练习 6.2 后半
+DESCRIPTION:第 2 周 · 手算梯度（草稿，周六复盘后在 ai-stud
+ eam 里重排）\n本周目标：学完第 6 章并打 Boss，第 7 章写
+ 出第一版训练循环。\n\n今天 1 小时：\n· 练习 6.2：从逐
+ 元素结果归纳一般式，做完小练习（60 分钟）\n\n勾任务
+ 、计时、做测验：https://claude.ai/artifact/DNdrzbZ41NYggPAc6wzkau
+URL:https://claude.ai/artifact/DNdrzbZ41NYggPAc6wzkau
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:练习 6.2 后半
+TRIGGER:-PT15M
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-11-04-0@ai-studeam.study-calendar
+DTSTAMP:20261026T053330Z
+DTSTART;TZID=Asia/Shanghai:20261104T210000
+DTEND;TZID=Asia/Shanghai:20261104T220000
+SUMMARY:阶段0 · 练习 6.3
+DESCRIPTION:第 2 周 · 手算梯度（草稿，周六复盘后在 ai-stud
+ eam 里重排）\n本周目标：学完第 6 章并打 Boss，第 7 章写
+ 出第一版训练循环。\n\n今天 1 小时：\n· 练习 6.3：数值
+ 梯度对拍（40 分钟）\n· 第 6 章答错的题（20 分钟）\n\n
+ 勾任务、计时、做测验：https://claude.ai/artifact/DNdrzbZ41NYggP
+ Ac6wzkau
+URL:https://claude.ai/artifact/DNdrzbZ41NYggPAc6wzkau
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:练习 6.3
+TRIGGER:-PT15M
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-11-05-0@ai-studeam.study-calendar
+DTSTAMP:20261026T053330Z
+DTSTART;TZID=Asia/Shanghai:20261105T210000
+DTEND;TZID=Asia/Shanghai:20261105T220000
+SUMMARY:阶段0 · 第 6 章 Boss
+DESCRIPTION:第 2 周 · 手算梯度（草稿，周六复盘后在 ai-stud
+ eam 里重排）\n本周目标：学完第 6 章并打 Boss，第 7 章写
+ 出第一版训练循环。\n\n今天 1 小时：\n· 挑战第 6 章 Boss
+ （30 分钟）\n· §7.1 准备数据（30 分钟）\n\n勾任务、计
+ 时、做测验：https://claude.ai/artifact/DNdrzbZ41NYggPAc6wzkau
+URL:https://claude.ai/artifact/DNdrzbZ41NYggPAc6wzkau
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:第 6 章 Boss
+TRIGGER:-PT15M
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-11-06-0@ai-studeam.study-calendar
+DTSTAMP:20261026T053330Z
+DTSTART;TZID=Asia/Shanghai:20261106T210000
+DTEND;TZID=Asia/Shanghai:20261106T220000
+SUMMARY:阶段0 · §7.2 初始化 · §7.3 前向
+DESCRIPTION:第 2 周 · 手算梯度（草稿，周六复盘后在 ai-stud
+ eam 里重排）\n本周目标：学完第 6 章并打 Boss，第 7 章写
+ 出第一版训练循环。\n\n今天 1 小时：\n· §7.2 初始化参
+ 数：为什么要除以 n_in**0.5（30 分钟）\n· §7.3 前向：每
+ 一步的形状和含义（30 分钟）\n\n勾任务、计时、做测验
+ ：https://claude.ai/artifact/DNdrzbZ41NYggPAc6wzkau
+URL:https://claude.ai/artifact/DNdrzbZ41NYggPAc6wzkau
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:§7.2 初始化 · §7.3 前向
+TRIGGER:-PT15M
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-11-07-0@ai-studeam.study-calendar
+DTSTAMP:20261026T053330Z
+DTSTART;TZID=Asia/Shanghai:20261107T090000
+DTEND;TZID=Asia/Shanghai:20261107T120000
+SUMMARY:阶段0 · 手写训练循环（上午）
+DESCRIPTION:第 2 周 · 手算梯度（草稿，周六复盘后在 ai-stud
+ eam 里重排）\n本周目标：学完第 6 章并打 Boss，第 7 章写
+ 出第一版训练循环。\n\n今天 5 小时：\n· §7.4 手写交叉
+ 熵：用 3 个数走一遍（60 分钟）\n· §7.5 开跑前的两个检
+ 查（60 分钟）\n· §7.6 完整训练循环：写出第一版并跑通
+ （120 分钟）\n· 第 5、6 章没过的 Boss 重打（30 分钟）\n·
+  复习本周错题（30 分钟）\n\n勾任务、计时、做测验：htt
+ ps://claude.ai/artifact/DNdrzbZ41NYggPAc6wzkau
+URL:https://claude.ai/artifact/DNdrzbZ41NYggPAc6wzkau
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:手写训练循环
+TRIGGER:-PT15M
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-11-07-1@ai-studeam.study-calendar
+DTSTAMP:20261026T053330Z
+DTSTART;TZID=Asia/Shanghai:20261107T140000
+DTEND;TZID=Asia/Shanghai:20261107T160000
+SUMMARY:阶段0 · 手写训练循环（下午）
+DESCRIPTION:第 2 周 · 手算梯度（草稿，周六复盘后在 ai-stud
+ eam 里重排）\n本周目标：学完第 6 章并打 Boss，第 7 章写
+ 出第一版训练循环。\n\n今天 5 小时：\n· §7.4 手写交叉
+ 熵：用 3 个数走一遍（60 分钟）\n· §7.5 开跑前的两个检
+ 查（60 分钟）\n· §7.6 完整训练循环：写出第一版并跑通
+ （120 分钟）\n· 第 5、6 章没过的 Boss 重打（30 分钟）\n·
+  复习本周错题（30 分钟）\n\n勾任务、计时、做测验：htt
+ ps://claude.ai/artifact/DNdrzbZ41NYggPAc6wzkau
+URL:https://claude.ai/artifact/DNdrzbZ41NYggPAc6wzkau
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:手写训练循环
+TRIGGER:-PT15M
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-11-09-0@ai-studeam.study-calendar
+DTSTAMP:20261026T053330Z
+DTSTART;TZID=Asia/Shanghai:20261109T210000
+DTEND;TZID=Asia/Shanghai:20261109T220000
+SUMMARY:阶段0 · §7.6 复盘
+DESCRIPTION:第 3 周 · 训练 MNIST（草稿，周六复盘后在 ai-stud
+ eam 里重排）\n本周目标：第 7 章收尾（破坏性实验、换
+ 官方 API），学完第 8 章。\n\n今天 1 小时：\n· §7.6 训练
+ 循环：逐行说出每一步的形状，记下测试准确率（60 分
+ 钟）\n\n勾任务、计时、做测验：https://claude.ai/artifact/DNdr
+ zbZ41NYggPAc6wzkau
+URL:https://claude.ai/artifact/DNdrzbZ41NYggPAc6wzkau
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:§7.6 复盘
+TRIGGER:-PT15M
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-11-10-0@ai-studeam.study-calendar
+DTSTAMP:20261026T053330Z
+DTSTART;TZID=Asia/Shanghai:20261110T210000
+DTEND;TZID=Asia/Shanghai:20261110T220000
+SUMMARY:阶段0 · 破坏性实验 1、2
+DESCRIPTION:第 3 周 · 训练 MNIST（草稿，周六复盘后在 ai-stud
+ eam 里重排）\n本周目标：第 7 章收尾（破坏性实验、换
+ 官方 API），学完第 8 章。\n\n今天 1 小时：\n· §7.7 忘记
+ 清梯度、学习率过大：记下 loss 曲线（60 分钟）\n\n勾任
+ 务、计时、做测验：https://claude.ai/artifact/DNdrzbZ41NYggPAc6wzk
+ au
+URL:https://claude.ai/artifact/DNdrzbZ41NYggPAc6wzkau
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:破坏性实验 1、2
+TRIGGER:-PT15M
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-11-11-0@ai-studeam.study-calendar
+DTSTAMP:20261026T053330Z
+DTSTART;TZID=Asia/Shanghai:20261111T210000
+DTEND;TZID=Asia/Shanghai:20261111T220000
+SUMMARY:阶段0 · 破坏性实验 3、4
+DESCRIPTION:第 3 周 · 训练 MNIST（草稿，周六复盘后在 ai-stud
+ eam 里重排）\n本周目标：第 7 章收尾（破坏性实验、换
+ 官方 API），学完第 8 章。\n\n今天 1 小时：\n· §7.7 学习
+ 率过小、不缩放初始化：记下 loss 曲线（60 分钟）\n\n勾
+ 任务、计时、做测验：https://claude.ai/artifact/DNdrzbZ41NYggPAc6
+ wzkau
+URL:https://claude.ai/artifact/DNdrzbZ41NYggPAc6wzkau
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:破坏性实验 3、4
+TRIGGER:-PT15M
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-11-12-0@ai-studeam.study-calendar
+DTSTAMP:20261026T053330Z
+DTSTART;TZID=Asia/Shanghai:20261112T210000
+DTEND;TZID=Asia/Shanghai:20261112T220000
+SUMMARY:阶段0 · §7.8 官方 API
+DESCRIPTION:第 3 周 · 训练 MNIST（草稿，周六复盘后在 ai-stud
+ eam 里重排）\n本周目标：第 7 章收尾（破坏性实验、换
+ 官方 API），学完第 8 章。\n\n今天 1 小时：\n· §7.8 换成 
+ nn.Sequential + SGD，说出四行封装了手写的哪部分（60 分钟
+ ）\n\n勾任务、计时、做测验：https://claude.ai/artifact/DNdrzbZ
+ 41NYggPAc6wzkau
+URL:https://claude.ai/artifact/DNdrzbZ41NYggPAc6wzkau
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:§7.8 官方 API
+TRIGGER:-PT15M
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-11-13-0@ai-studeam.study-calendar
+DTSTAMP:20261026T053330Z
+DTSTART;TZID=Asia/Shanghai:20261113T210000
+DTEND;TZID=Asia/Shanghai:20261113T220000
+SUMMARY:阶段0 · 第 7 章 Boss
+DESCRIPTION:第 3 周 · 训练 MNIST（草稿，周六复盘后在 ai-stud
+ eam 里重排）\n本周目标：第 7 章收尾（破坏性实验、换
+ 官方 API），学完第 8 章。\n\n今天 1 小时：\n· 挑战第 7 
+ 章 Boss（30 分钟）\n· 第 7 章答错的题（30 分钟）\n\n勾任
+ 务、计时、做测验：https://claude.ai/artifact/DNdrzbZ41NYggPAc6wzk
+ au
+URL:https://claude.ai/artifact/DNdrzbZ41NYggPAc6wzkau
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:第 7 章 Boss
+TRIGGER:-PT15M
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-11-14-0@ai-studeam.study-calendar
+DTSTAMP:20261026T053330Z
+DTSTART;TZID=Asia/Shanghai:20261114T090000
+DTEND;TZID=Asia/Shanghai:20261114T120000
+SUMMARY:阶段0 · 第 8 章 · 计时重写（上午）
+DESCRIPTION:第 3 周 · 训练 MNIST（草稿，周六复盘后在 ai-stud
+ eam 里重排）\n本周目标：第 7 章收尾（破坏性实验、换
+ 官方 API），学完第 8 章。\n\n今天 5 小时：\n· 不看手册
+ ，从空文件重写训练循环（计时）（90 分钟）\n· 第 8 章
+ ：报错表逐条亲手触发一遍（90 分钟）\n· 挑战第 8 章 Bo
+ ss（30 分钟）\n· 复习第 4–7 章错题（60 分钟）\n· 再计
+ 时重写一次，目标 20 分钟内（30 分钟）\n\n勾任务、计时
+ 、做测验：https://claude.ai/artifact/DNdrzbZ41NYggPAc6wzkau
+URL:https://claude.ai/artifact/DNdrzbZ41NYggPAc6wzkau
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:第 8 章 · 计时重写
+TRIGGER:-PT15M
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-11-14-1@ai-studeam.study-calendar
+DTSTAMP:20261026T053330Z
+DTSTART;TZID=Asia/Shanghai:20261114T140000
+DTEND;TZID=Asia/Shanghai:20261114T160000
+SUMMARY:阶段0 · 第 8 章 · 计时重写（下午）
+DESCRIPTION:第 3 周 · 训练 MNIST（草稿，周六复盘后在 ai-stud
+ eam 里重排）\n本周目标：第 7 章收尾（破坏性实验、换
+ 官方 API），学完第 8 章。\n\n今天 5 小时：\n· 不看手册
+ ，从空文件重写训练循环（计时）（90 分钟）\n· 第 8 章
+ ：报错表逐条亲手触发一遍（90 分钟）\n· 挑战第 8 章 Bo
+ ss（30 分钟）\n· 复习第 4–7 章错题（60 分钟）\n· 再计
+ 时重写一次，目标 20 分钟内（30 分钟）\n\n勾任务、计时
+ 、做测验：https://claude.ai/artifact/DNdrzbZ41NYggPAc6wzkau
+URL:https://claude.ai/artifact/DNdrzbZ41NYggPAc6wzkau
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:第 8 章 · 计时重写
+TRIGGER:-PT15M
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-11-16-0@ai-studeam.study-calendar
+DTSTAMP:20261026T053330Z
+DTSTART;TZID=Asia/Shanghai:20261116T210000
+DTEND;TZID=Asia/Shanghai:20261116T220000
+SUMMARY:阶段0 · 复习第 2–3 章
+DESCRIPTION:第 4 周 · 出师（草稿，周六复盘后在 ai-studeam 
+ 里重排）\n本周目标：全书复习，周六做第 9 章出师测验
+ ，阶段 0 结束，进入 nanoGPT 阶段 1。\n\n今天 1 小时：\n· 
+ reduce、keepdim、广播复制规则：题库里 ✗ 多的题重做（60
+  分钟）\n\n勾任务、计时、做测验：https://claude.ai/artifact/
+ DNdrzbZ41NYggPAc6wzkau
+URL:https://claude.ai/artifact/DNdrzbZ41NYggPAc6wzkau
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:复习第 2–3 章
+TRIGGER:-PT15M
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-11-17-0@ai-studeam.study-calendar
+DTSTAMP:20261026T053330Z
+DTSTART;TZID=Asia/Shanghai:20261117T210000
+DTEND;TZID=Asia/Shanghai:20261117T220000
+SUMMARY:阶段0 · 复习第 4–5 章
+DESCRIPTION:第 4 周 · 出师（草稿，周六复盘后在 ai-studeam 
+ 里重排）\n本周目标：全书复习，周六做第 9 章出师测验
+ ，阶段 0 结束，进入 nanoGPT 阶段 1。\n\n今天 1 小时：\n· 
+ view / contiguous、多头切分、.grad 累加、原地更新（60 分钟
+ ）\n\n勾任务、计时、做测验：https://claude.ai/artifact/DNdrzbZ
+ 41NYggPAc6wzkau
+URL:https://claude.ai/artifact/DNdrzbZ41NYggPAc6wzkau
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:复习第 4–5 章
+TRIGGER:-PT15M
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-11-18-0@ai-studeam.study-calendar
+DTSTAMP:20261026T053330Z
+DTSTART;TZID=Asia/Shanghai:20261118T210000
+DTEND;TZID=Asia/Shanghai:20261118T220000
+SUMMARY:阶段0 · 复习第 6–7 章
+DESCRIPTION:第 4 周 · 出师（草稿，周六复盘后在 ai-studeam 
+ 里重排）\n本周目标：全书复习，周六做第 9 章出师测验
+ ，阶段 0 结束，进入 nanoGPT 阶段 1。\n\n今天 1 小时：\n· 
+ 矩阵乘法的梯度、交叉熵、初始 loss ≈ ln(10)（60 分钟）\
+ n\n勾任务、计时、做测验：https://claude.ai/artifact/DNdrzbZ41NY
+ ggPAc6wzkau
+URL:https://claude.ai/artifact/DNdrzbZ41NYggPAc6wzkau
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:复习第 6–7 章
+TRIGGER:-PT15M
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-11-19-0@ai-studeam.study-calendar
+DTSTAMP:20261026T053330Z
+DTSTART;TZID=Asia/Shanghai:20261119T210000
+DTEND;TZID=Asia/Shanghai:20261119T220000
+SUMMARY:阶段0 · 计时写训练循环
+DESCRIPTION:第 4 周 · 出师（草稿，周六复盘后在 ai-studeam 
+ 里重排）\n本周目标：全书复习，周六做第 9 章出师测验
+ ，阶段 0 结束，进入 nanoGPT 阶段 1。\n\n今天 1 小时：\n· 
+ 20 分钟从空文件写完训练循环，测试准确率 96%+（40 分钟
+ ）\n· 卡住的地方回手册补（20 分钟）\n\n勾任务、计时
+ 、做测验：https://claude.ai/artifact/DNdrzbZ41NYggPAc6wzkau
+URL:https://claude.ai/artifact/DNdrzbZ41NYggPAc6wzkau
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:计时写训练循环
+TRIGGER:-PT15M
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-11-20-0@ai-studeam.study-calendar
+DTSTAMP:20261026T053330Z
+DTSTART;TZID=Asia/Shanghai:20261120T210000
+DTEND;TZID=Asia/Shanghai:20261120T220000
+SUMMARY:阶段0 · 第 8 章复述
+DESCRIPTION:第 4 周 · 出师（草稿，周六复盘后在 ai-studeam 
+ 里重排）\n本周目标：全书复习，周六做第 9 章出师测验
+ ，阶段 0 结束，进入 nanoGPT 阶段 1。\n\n今天 1 小时：\n· 
+ 第 8 章报错表：每条说出真实原因和处理（30 分钟）\n· 
+ 没过的 Boss 重打（30 分钟）\n\n勾任务、计时、做测验：h
+ ttps://claude.ai/artifact/DNdrzbZ41NYggPAc6wzkau
+URL:https://claude.ai/artifact/DNdrzbZ41NYggPAc6wzkau
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:第 8 章复述
+TRIGGER:-PT15M
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-11-21-0@ai-studeam.study-calendar
+DTSTAMP:20261026T053330Z
+DTSTART;TZID=Asia/Shanghai:20261121T090000
+DTEND;TZID=Asia/Shanghai:20261121T120000
+SUMMARY:阶段0 · 出师测验（上午）
+DESCRIPTION:第 4 周 · 出师（草稿，周六复盘后在 ai-studeam 
+ 里重排）\n本周目标：全书复习，周六做第 9 章出师测验
+ ，阶段 0 结束，进入 nanoGPT 阶段 1。\n\n今天 5 小时：\n· 
+ 第 9 章题 1–16：不查文档、不跑代码（90 分钟）\n· 动
+ 手题 17：20 分钟写完训练循环，准确率 96%+（60 分钟）\n
+ · 对答案，错的回到对应小节补（60 分钟）\n· 阶段 0 总
+ 复盘，读「附：和阶段 2 的对照」（60 分钟）\n· 预习阶
+ 段 1：打开 nanoGPT 的 model.py 看结构（30 分钟）\n\n勾任务
+ 、计时、做测验：https://claude.ai/artifact/DNdrzbZ41NYggPAc6wzkau
+URL:https://claude.ai/artifact/DNdrzbZ41NYggPAc6wzkau
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:出师测验
+TRIGGER:-PT15M
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-11-21-1@ai-studeam.study-calendar
+DTSTAMP:20261026T053330Z
+DTSTART;TZID=Asia/Shanghai:20261121T140000
+DTEND;TZID=Asia/Shanghai:20261121T160000
+SUMMARY:阶段0 · 出师测验（下午）
+DESCRIPTION:第 4 周 · 出师（草稿，周六复盘后在 ai-studeam 
+ 里重排）\n本周目标：全书复习，周六做第 9 章出师测验
+ ，阶段 0 结束，进入 nanoGPT 阶段 1。\n\n今天 5 小时：\n· 
+ 第 9 章题 1–16：不查文档、不跑代码（90 分钟）\n· 动
+ 手题 17：20 分钟写完训练循环，准确率 96%+（60 分钟）\n
+ · 对答案，错的回到对应小节补（60 分钟）\n· 阶段 0 总
+ 复盘，读「附：和阶段 2 的对照」（60 分钟）\n· 预习阶
+ 段 1：打开 nanoGPT 的 model.py 看结构（30 分钟）\n\n勾任务
+ 、计时、做测验：https://claude.ai/artifact/DNdrzbZ41NYggPAc6wzkau
+URL:https://claude.ai/artifact/DNdrzbZ41NYggPAc6wzkau
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:出师测验
+TRIGGER:-PT15M
+END:VALARM
+END:VEVENT
+END:VCALENDAR

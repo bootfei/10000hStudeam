@@ -1,0 +1,320 @@
+<title>阶段 0 学习日历</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&display=swap">
+<style>
+  /* 布局：和 ai-studeam 同一个 Steam 式深色世界（刻意单主题）—— 顶栏 + 章节成就条 + 4 周 × 7 天日历格；窄屏改成按天的列表 */
+  :root {
+    color-scheme: dark;
+    --top: #171a21; --bg: #1b2838; --panel: #16202d; --panel2: #213042; --well: #0e141b; --line: #2a475e;
+    --text: #c7d5e0; --dim: #8f98a0; --white: #ffffff; --blue: #66c0f4; --green: #75b022; --green2: #4c7a1a;
+    --c4: #66c0f4; --c5: #b69cf0; --c6: #e5b143; --c7: #e98f3c; --c8: #e06c5a; --c9: #ffffff; --review: #8f98a0;
+    --font: "Motiva Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+    --display: "Barlow Condensed", "Helvetica Neue", Arial, "PingFang SC", sans-serif;
+    --gutter-l: max(16px, env(safe-area-inset-left, 0px));
+    --gutter-r: max(16px, env(safe-area-inset-right, 0px));
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.5 var(--font); }
+  a { color: var(--blue); }
+  a:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+  .wrap { max-width: 1280px; margin: 0 auto; padding-left: var(--gutter-l); padding-right: var(--gutter-r); }
+
+  /* 顶栏 */
+  .top { background: var(--top); }
+  .top .wrap { padding-block: 28px 24px; display: flex; flex-wrap: wrap; gap: 20px 40px; align-items: flex-end; }
+  .eyebrow { font: 600 13px/1 var(--display); letter-spacing: 2px; color: var(--blue); text-transform: uppercase; }
+  h1 { margin: 8px 0 6px; font-size: 32px; line-height: 1.2; color: var(--white); text-wrap: balance; }
+  .sub { color: var(--dim); }
+  .stats { margin-left: auto; display: flex; gap: 28px; flex-wrap: wrap; }
+  .stat { font-size: 12px; color: var(--dim); }
+  .stat b { display: block; font: 700 30px/1.1 var(--display); color: var(--white); font-variant-numeric: tabular-nums; }
+
+  /* 章节成就条 */
+  .chapters { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 2px; }
+  .chbar { background: linear-gradient(180deg, #1f3a52, var(--bg)); }
+  .chbar .wrap { padding-block: 18px; }
+  .ch { background: var(--panel); padding: 10px 10px 9px; border-top: 3px solid var(--line); min-width: 0; }
+  .ch .cn { font: 700 18px/1 var(--display); color: var(--white); }
+  .ch .cname { display: block; font-size: 12px; line-height: 1.35; margin-top: 4px; overflow-wrap: anywhere; }
+  .ch .cstat { display: block; font: 600 13px/1.3 var(--display); letter-spacing: .5px; color: var(--dim); margin-top: 2px; font-variant-numeric: tabular-nums; }
+  .ch.done { border-top-color: var(--green2); }
+  .ch.done .cstat { color: var(--green); }
+  .ch.now { background: var(--panel2); outline: 1px solid var(--blue); outline-offset: -1px; }
+  .ch.now .cstat { color: var(--blue); }
+
+  /* 日历 */
+  .cal .wrap { padding-block: 8px 40px; }
+  .colhead { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)) minmax(0, .55fr); gap: 2px; margin-top: 16px; }
+  .colhead span { font: 600 13px/1 var(--display); letter-spacing: 1.5px; color: var(--dim); padding: 6px 10px; }
+  .week { margin-top: 22px; }
+  .whead { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; padding: 0 2px 8px; }
+  .wno { font: 700 15px/1 var(--display); letter-spacing: 1.5px; color: var(--blue); }
+  .whead h2 { margin: 0; font-size: 18px; color: var(--white); }
+  .wrange { font: 500 15px/1 var(--display); color: var(--dim); font-variant-numeric: tabular-nums; }
+  .pill { font-size: 12px; padding: 1px 8px; border-radius: 2px; border: 1px solid var(--line); color: var(--dim); }
+  .pill.ok { border-color: var(--green2); color: var(--green); }
+  .whours { margin-left: auto; font: 700 18px/1 var(--display); color: var(--white); font-variant-numeric: tabular-nums; }
+  .wgoal { margin: 0 2px 10px; color: var(--text); max-width: 80ch; }
+  .wgoal b { color: var(--dim); font-weight: 400; }
+  .grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)) minmax(0, .55fr); gap: 2px; }
+  .week.draft .day:not(.rest) { background: #141d29; }
+
+  .day { background: var(--panel); padding: 10px 10px 12px; min-width: 0; position: relative; }
+  .dhead { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+  .dnum { font: 700 26px/1 var(--display); color: var(--white); font-variant-numeric: tabular-nums; }
+  .dmon { font: 600 13px/1 var(--display); color: var(--blue); }
+  .dwk { display: none; color: var(--dim); font-size: 13px; }
+  .slot { margin-left: auto; font: 600 13px/1.2 var(--display); color: var(--dim); font-variant-numeric: tabular-nums; text-align: right; }
+  .dtitle { color: var(--white); font-weight: 700; margin: 6px 0 6px; line-height: 1.35; }
+  .tasks { list-style: none; margin: 0; padding: 0; display: grid; gap: 5px; }
+  .tasks li { display: grid; grid-template-columns: 7px minmax(0, 1fr) auto; gap: 6px; font-size: 12.5px; line-height: 1.4; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; margin-top: 5px; background: var(--review); }
+  .tasks .m { font: 600 13px/1.35 var(--display); color: var(--dim); font-variant-numeric: tabular-nums; }
+  .k4 { background: var(--c4); } .k5 { background: var(--c5); } .k6 { background: var(--c6); }
+  .k7 { background: var(--c7); } .k8 { background: var(--c8); } .k9 { background: var(--c9); }
+  .ch.k4c { border-top-color: var(--c4); } .ch.k5c { border-top-color: var(--c5); } .ch.k6c { border-top-color: var(--c6); }
+  .ch.k7c { border-top-color: var(--c7); } .ch.k8c { border-top-color: var(--c8); } .ch.k9c { border-top-color: var(--c9); }
+
+  .day.rest { background: transparent; border: 1px dashed var(--line); }
+  .day.rest .dnum { color: var(--dim); }
+  .restlabel { color: var(--dim); margin-top: 6px; font-size: 13px; }
+  .day.today { outline: 2px solid var(--blue); outline-offset: -2px; background: var(--panel2); }
+  .badge { font-size: 11px; background: var(--blue); color: var(--well); padding: 0 6px; border-radius: 2px; font-weight: 700; }
+  .day.past { opacity: .55; }
+
+  /* 使用说明 */
+  .how { background: var(--panel); border-top: 1px solid var(--line); }
+  .how .wrap { padding-block: 20px 28px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px 28px; }
+  .how h3 { margin: 0 0 4px; font-size: 14px; color: var(--white); }
+  .how p { margin: 0; color: var(--dim); font-size: 13px; }
+
+  @media (max-width: 1000px) {
+    .chapters { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  }
+  @media (max-width: 760px) {
+    h1 { font-size: 26px; }
+    .stats { margin-left: 0; gap: 22px; }
+    .colhead { display: none; }
+    .grid { grid-template-columns: minmax(0, 1fr); }
+    .dwk { display: inline; }
+    .day.rest { display: flex; align-items: baseline; gap: 10px; padding-block: 8px; }
+    .day.rest .restlabel { margin: 0; }
+    .how .wrap { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (max-width: 420px) {
+    .chapters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <div>
+      <div class="eyebrow">ai-studeam · PyTorch 手感 · 阶段 0</div>
+      <h1>阶段 0 学习日历</h1>
+      <div class="sub" id="sub"></div>
+    </div>
+    <div class="stats" id="stats"></div>
+  </div>
+</header>
+
+<section class="chbar" aria-label="章节进度">
+  <div class="wrap"><ol class="chapters" id="chapters"></ol></div>
+</section>
+
+<main class="cal">
+  <div class="wrap">
+    <div class="colhead" aria-hidden="true"><span>周一</span><span>周二</span><span>周三</span><span>周四</span><span>周五</span><span>周六</span><span>周日</span></div>
+    <div id="weeks"></div>
+  </div>
+</main>
+
+<footer class="how">
+  <div class="wrap">
+    <div>
+      <h3>每天在 ai-studeam 里打卡</h3>
+      <p>第 1 周的任务已经排进 <a href="https://claude.ai/artifact/DNdrzbZ41NYggPAc6wzkau" target="_blank" rel="noopener">ai-studeam</a>，勾任务、计时、做测验都在那里。这页只用来看全局。</p>
+    </div>
+    <div>
+      <h3>第 2–4 周是草稿</h3>
+      <p>每周六学完，在 ai-studeam 点「复盘这周，排下周」，按实际进度重排。重排之后，这页和系统日历要重新生成一次。</p>
+    </div>
+    <div>
+      <h3>系统日历的时间</h3>
+      <p>工作日 21:00–22:00；周六 9:00 开始，5 小时的周六 14:00–16:00 继续；提前 15 分钟提醒。周日是主日，不排学习。</p>
+    </div>
+  </div>
+</footer>
+
+<script type="application/json" id="plan">
+{
+  "slots": { "weekday": "21:00", "satMorning": "09:00", "satMorningMax": 180, "satAfternoon": "14:00" },
+  "chapters": [
+    { "n": 0, "name": "环境准备", "done": "2026-10-07" },
+    { "n": 1, "name": "张量心智模型", "done": "2026-10-07" },
+    { "n": 2, "name": "形状与数值", "done": "2026-10-08" },
+    { "n": 3, "name": "广播", "done": "2026-10-13" },
+    { "n": 4, "name": "view / contiguous", "plan": "2026-10-29" },
+    { "n": 5, "name": "autograd", "plan": "2026-10-31" },
+    { "n": 6, "name": "手算梯度对拍", "plan": "2026-11-05" },
+    { "n": 7, "name": "徒手 MLP · MNIST", "plan": "2026-11-13" },
+    { "n": 8, "name": "常见报错速查", "plan": "2026-11-14" },
+    { "n": 9, "name": "出师测验", "plan": "2026-11-21" }
+  ],
+  "weeks": [
+    { "mon": "2026-10-26", "name": "重启周", "goal": "打完第 4 章 Boss，学完第 5 章并打 Boss。周六先排 3 小时，下周恢复 5 小时。", "draft": false },
+    { "mon": "2026-11-02", "name": "手算梯度", "goal": "学完第 6 章并打 Boss，第 7 章写出第一版训练循环。", "draft": true },
+    { "mon": "2026-11-09", "name": "训练 MNIST", "goal": "第 7 章收尾（破坏性实验、换官方 API），学完第 8 章。", "draft": true },
+    { "mon": "2026-11-16", "name": "出师", "goal": "全书复习，周六做第 9 章出师测验，阶段 0 结束，进入 nanoGPT 阶段 1。", "draft": true }
+  ],
+  "days": {
+    "2026-10-26": { "title": "回温第 4 章", "tasks": [
+      ["回温：重读 §4.1–4.3，用 arange(12) 重新手算 view / transpose / stride", 30, 4],
+      ["第 4 章答错的 view / stride 题，先写答案再对答案", 30, 4] ] },
+    "2026-10-27": { "title": "§4.4 contiguous", "tasks": [
+      ["§4.4：触发 view 报错，再用 contiguous() / reshape 修好", 40, 4],
+      ["练习 4.2：用自己的话解释那条报错", 20, 4] ] },
+    "2026-10-28": { "title": "§4.5 多头切分", "tasks": [
+      ["§4.5：手算 view + transpose 后每个 token 的数去了哪里", 40, 4],
+      ["练习 4.1：切过去再切回来，确认和原张量完全相等", 20, 4] ] },
+    "2026-10-29": { "title": "第 4 章 Boss", "tasks": [
+      ["挑战第 4 章 Boss，没过的题弄懂再打", 30, 4],
+      ["§5.1 梯度在数值上是什么", 30, 5] ] },
+    "2026-10-30": { "title": "§5.2 计算图", "tasks": [
+      ["§5.2 计算图与 .grad 累加：x**2 连续两次 backward", 40, 5],
+      ["第 5 章答错的题，先写答案再对", 20, 5] ] },
+    "2026-10-31": { "title": "第 5 章 Boss", "tasks": [
+      ["§5.3 三个关掉磁带的场景", 20, 5],
+      ["§5.4 手动更新的陷阱：两种错误写法都跑一遍", 50, 5],
+      ["§5.5 loss 累加用 .item()", 20, 5],
+      ["挑战第 5 章 Boss", 30, 5],
+      ["练习 6.1：纸上手算梯度，再用 autograd 对拍", 40, 6],
+      ["复习本周错题", 20, null] ] },
+
+    "2026-11-02": { "title": "练习 6.2 前半", "tasks": [
+      ["练习 6.2：用 2×2 小例子逐项展开，逐元素写出 dW", 60, 6] ] },
+    "2026-11-03": { "title": "练习 6.2 后半", "tasks": [
+      ["练习 6.2：从逐元素结果归纳一般式，做完小练习", 60, 6] ] },
+    "2026-11-04": { "title": "练习 6.3", "tasks": [
+      ["练习 6.3：数值梯度对拍", 40, 6],
+      ["第 6 章答错的题", 20, 6] ] },
+    "2026-11-05": { "title": "第 6 章 Boss", "tasks": [
+      ["挑战第 6 章 Boss", 30, 6],
+      ["§7.1 准备数据", 30, 7] ] },
+    "2026-11-06": { "title": "§7.2 初始化 · §7.3 前向", "tasks": [
+      ["§7.2 初始化参数：为什么要除以 n_in**0.5", 30, 7],
+      ["§7.3 前向：每一步的形状和含义", 30, 7] ] },
+    "2026-11-07": { "title": "手写训练循环", "tasks": [
+      ["§7.4 手写交叉熵：用 3 个数走一遍", 60, 7],
+      ["§7.5 开跑前的两个检查", 60, 7],
+      ["§7.6 完整训练循环：写出第一版并跑通", 120, 7],
+      ["第 5、6 章没过的 Boss 重打", 30, null],
+      ["复习本周错题", 30, null] ] },
+
+    "2026-11-09": { "title": "§7.6 复盘", "tasks": [
+      ["§7.6 训练循环：逐行说出每一步的形状，记下测试准确率", 60, 7] ] },
+    "2026-11-10": { "title": "破坏性实验 1、2", "tasks": [
+      ["§7.7 忘记清梯度、学习率过大：记下 loss 曲线", 60, 7] ] },
+    "2026-11-11": { "title": "破坏性实验 3、4", "tasks": [
+      ["§7.7 学习率过小、不缩放初始化：记下 loss 曲线", 60, 7] ] },
+    "2026-11-12": { "title": "§7.8 官方 API", "tasks": [
+      ["§7.8 换成 nn.Sequential + SGD，说出四行封装了手写的哪部分", 60, 7] ] },
+    "2026-11-13": { "title": "第 7 章 Boss", "tasks": [
+      ["挑战第 7 章 Boss", 30, 7],
+      ["第 7 章答错的题", 30, 7] ] },
+    "2026-11-14": { "title": "第 8 章 · 计时重写", "tasks": [
+      ["不看手册，从空文件重写训练循环（计时）", 90, 7],
+      ["第 8 章：报错表逐条亲手触发一遍", 90, 8],
+      ["挑战第 8 章 Boss", 30, 8],
+      ["复习第 4–7 章错题", 60, null],
+      ["再计时重写一次，目标 20 分钟内", 30, 7] ] },
+
+    "2026-11-16": { "title": "复习第 2–3 章", "tasks": [
+      ["reduce、keepdim、广播复制规则：题库里 ✗ 多的题重做", 60, null] ] },
+    "2026-11-17": { "title": "复习第 4–5 章", "tasks": [
+      ["view / contiguous、多头切分、.grad 累加、原地更新", 60, null] ] },
+    "2026-11-18": { "title": "复习第 6–7 章", "tasks": [
+      ["矩阵乘法的梯度、交叉熵、初始 loss ≈ ln(10)", 60, null] ] },
+    "2026-11-19": { "title": "计时写训练循环", "tasks": [
+      ["20 分钟从空文件写完训练循环，测试准确率 96%+", 40, 7],
+      ["卡住的地方回手册补", 20, null] ] },
+    "2026-11-20": { "title": "第 8 章复述", "tasks": [
+      ["第 8 章报错表：每条说出真实原因和处理", 30, 8],
+      ["没过的 Boss 重打", 30, null] ] },
+    "2026-11-21": { "title": "出师测验", "tasks": [
+      ["第 9 章题 1–16：不查文档、不跑代码", 90, 9],
+      ["动手题 17：20 分钟写完训练循环，准确率 96%+", 60, 9],
+      ["对答案，错的回到对应小节补", 60, 9],
+      ["阶段 0 总复盘，读「附：和阶段 2 的对照」", 60, null],
+      ["预习阶段 1：打开 nanoGPT 的 model.py 看结构", 30, null] ] }
+  }
+}
+</script>
+
+<script>
+const P = JSON.parse(document.getElementById('plan').textContent);
+const WK = ['日', '一', '二', '三', '四', '五', '六'];
+const pad = n => String(n).padStart(2, '0');
+const iso = t => `${t.getFullYear()}-${pad(t.getMonth() + 1)}-${pad(t.getDate())}`;
+const addDays = (d, n) => { const t = new Date(d + 'T00:00:00'); t.setDate(t.getDate() + n); return iso(t); };
+const wday = d => new Date(d + 'T00:00:00').getDay();
+const md = d => `${+d.slice(5, 7)}/${d.slice(8)}`;
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const toMin = s => +s.slice(0, 2) * 60 + +s.slice(3);
+const hm = m => `${Math.floor(m / 60)}:${pad(m % 60)}`;
+const hours = m => `${+(m / 60).toFixed(1)} h`;
+const mins = d => (P.days[d]?.tasks || []).reduce((a, t) => a + t[1], 0);
+const today = iso(new Date());
+
+// 和 make_ics.py 用同一套规则：工作日晚上一段；周六上午最多 3 小时，超出的放到下午
+function slot(d) {
+  const m = mins(d), S = P.slots;
+  if (wday(d) !== 6) return `${hm(toMin(S.weekday))}–${hm(toMin(S.weekday) + m)}`;
+  const am = toMin(S.satMorning), pm = toMin(S.satAfternoon);
+  if (m <= S.satMorningMax) return `${hm(am)}–${hm(am + m)}`;
+  return `${hm(am)}–${hm(am + S.satMorningMax)} · ${hm(pm)}–${hm(pm + m - S.satMorningMax)}`;
+}
+
+const first = P.weeks[0].mon, last = addDays(P.weeks[P.weeks.length - 1].mon, 5);
+const total = Object.keys(P.days).reduce((a, d) => a + mins(d), 0);
+const doneCh = P.chapters.filter(c => c.done).length;
+document.getElementById('sub').textContent =
+  `${+first.slice(5, 7)} 月 ${+first.slice(8)} 日 – ${+last.slice(5, 7)} 月 ${+last.slice(8)} 日 · 4 周 · 工作日每天 1 小时，周六 3–5 小时，周日主日休息`;
+document.getElementById('stats').innerHTML = [
+  [`${doneCh} / ${P.chapters.length}`, '章已通关'],
+  [hours(total).replace(' h', ''), '计划小时'],
+  [md(P.chapters[P.chapters.length - 1].plan), '预计出师'],
+].map(([v, l]) => `<div class="stat"><b>${esc(v)}</b>${esc(l)}</div>`).join('');
+
+const nowCh = P.chapters.find(c => !c.done);
+document.getElementById('chapters').innerHTML = P.chapters.map(c => {
+  const cls = c.done ? 'done' : `k${c.n}c${c === nowCh ? ' now' : ''}`;
+  const st = c.done ? `✓ ${md(c.done)} 通关` : c.n === 9 ? `出师 ${md(c.plan)}` : `${c === nowCh ? '进行中 · ' : ''}Boss ${md(c.plan)}`;
+  return `<li class="ch ${cls}"><span class="cn">C${c.n}</span><span class="cname" title="${esc(c.name)}">${esc(c.name)}</span><span class="cstat">${esc(st)}</span></li>`;
+}).join('');
+
+function dayCell(d, isFirst) {
+  const n = +d.slice(8), showMon = isFirst || n === 1;
+  const state = d === today ? ' today' : d < today ? ' past' : '';
+  const head = `<span class="dnum">${n}</span>${showMon ? `<span class="dmon">${+d.slice(5, 7)}月</span>` : ''}<span class="dwk">周${WK[wday(d)]}</span>${d === today ? '<span class="badge">今天</span>' : ''}`;
+  if (wday(d) === 0) return `<div class="day rest${state}"><div class="dhead">${head}</div><div class="restlabel">主日 · 敬拜，不排学习</div></div>`;
+  const day = P.days[d];
+  if (!day) return `<div class="day${state}"><div class="dhead">${head}</div><div class="restlabel">没有安排</div></div>`;
+  const tasks = day.tasks.map(([t, m, c]) =>
+    `<li><i class="dot${c == null ? '' : ' k' + c}"></i><span>${esc(t)}</span><span class="m">${m}′</span></li>`).join('');
+  return `<div class="day${state}"><div class="dhead">${head}<span class="slot">${slot(d)}</span></div>
+    <div class="dtitle">${esc(day.title)}</div><ul class="tasks">${tasks}</ul></div>`;
+}
+
+document.getElementById('weeks').innerHTML = P.weeks.map((w, i) => {
+  const dates = Array.from({ length: 7 }, (_, k) => addDays(w.mon, k));
+  const wm = dates.reduce((a, d) => a + mins(d), 0);
+  return `<section class="week${w.draft ? ' draft' : ''}" aria-label="第 ${i + 1} 周">
+    <div class="whead"><span class="wno">第 ${i + 1} 周</span><span class="wrange">${md(dates[0])} – ${md(dates[6])}</span><h2>${esc(w.name)}</h2>
+      <span class="pill${w.draft ? '' : ' ok'}">${w.draft ? '草稿 · 周六复盘后重排' : '已排进 ai-studeam'}</span><span class="whours">${hours(wm)}</span></div>
+    <p class="wgoal"><b>目标</b>　${esc(w.goal)}</p>
+    <div class="grid">${dates.map((d, k) => dayCell(d, i === 0 && k === 0)).join('')}</div>
+  </section>`;
+}).join('');
+</script>
